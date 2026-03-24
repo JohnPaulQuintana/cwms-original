@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { motion } from "framer-motion";
@@ -6,6 +6,8 @@ import AuthLayout from "../../components/layout/AuthLayout";
 import { login } from "../../services/authService";
 import { useAuth } from "../../hooks/useAuth";
 import VerifyEmailPopup from "./VerifyEmailPopup";
+// import { toast } from "react-toastify";
+import CustomToast from "../../components/toast/CustomToast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,9 +16,28 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showVerifyPopup, setShowVerifyPopup] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type?: string } | null>(
+    null,
+  );
 
   const navigate = useNavigate();
   const { loginUser } = useAuth();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const verified = params.get("verified");
+
+    if (verified === "1") {
+      setToast({ message: "Email verified successfully!", type: "success" });
+      // Remove query so toast doesn’t show again
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (verified === "0") {
+      setToast({ message: "Invalid verification link!", type: "error" });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +74,13 @@ export default function LoginPage() {
 
   return (
     <AuthLayout title="Warehouse Monitoring Login">
+      {toast && (
+        <CustomToast
+          message={toast.message}
+          type={toast.type as any}
+          onClose={() => setToast(null)}
+        />
+      )}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -157,12 +185,12 @@ export default function LoginPage() {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ email }),
-            }
+            },
           );
           const data = await res.json();
           if (!data.success)
             throw new Error(
-              data.message || "Failed to send verification email"
+              data.message || "Failed to send verification email",
             );
           return data.message || "Verification email sent!";
         }}

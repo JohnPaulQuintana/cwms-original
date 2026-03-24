@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FiLogOut, FiMenu, FiBell } from "react-icons/fi";
+import { FiLogOut, FiMenu } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
 import { navConfig } from "../../config/navConfig";
@@ -26,6 +26,8 @@ export default function AdminLayout() {
     { id: 5, message: "Project approved by Admin", time: "1 hour ago" },
   ];
 
+  console.log(notifOpen)
+  console.log(notifications)
   const handleLogout = () => {
     logoutUser();
     navigate("/login");

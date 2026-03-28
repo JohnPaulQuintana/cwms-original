@@ -25,6 +25,7 @@ import ShipmentsPage from "../pages/staff/ShipmentsPage";
 import ProjectShipmentsPage from "../pages/manager/ProjectShipmentsPage";
 import DefectedPage from "../pages/staff/DefectedPage";
 import WarehouseRecord from "../pages/admin/records/WarehouseRecord";
+import RegisterPage from "../pages/auth/RegisterPage";
 export default function AppRouter() {
   return (
     <BrowserRouter>
@@ -47,6 +48,14 @@ export default function AppRouter() {
             element={
               <PublicRoute>
                 <ForgotPasswordPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <RegisterPage />
               </PublicRoute>
             }
           />

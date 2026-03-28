@@ -8,6 +8,7 @@ export interface Warehouse {
   name: string;
   description: string;
   address: string;
+  staff_id: number;
   created_at: string;
   updated_at: string;
 }

@@ -70,7 +70,7 @@ export default function ProjectRequestInventoryPage() {
         token,
         page,
         debouncedSearch,
-        selectedWarehouse
+        selectedWarehouse,
       );
       setInventory(res.data.data);
       setTotalPages(res.data.last_page);
@@ -113,7 +113,7 @@ export default function ProjectRequestInventoryPage() {
       const exists = prev.find((i) => i.id === modalItem.id);
       if (exists)
         return prev.map((i) =>
-          i.id === modalItem.id ? { ...i, requestedQty: modalQty } : i
+          i.id === modalItem.id ? { ...i, requestedQty: modalQty } : i,
         );
       return [...prev, { ...modalItem, requestedQty: modalQty }];
     });
@@ -144,7 +144,7 @@ export default function ProjectRequestInventoryPage() {
           inventory_id: i.id,
           warehouse_id: i.location_id,
           requested_qty: i.requestedQty,
-        }))
+        })),
       );
       console.log("Submitting request:", requestList);
       showToast("Inventory request submitted successfully!", "success");
@@ -154,6 +154,7 @@ export default function ProjectRequestInventoryPage() {
     }
   };
 
+  // console.log(warehouses)
   if (loading)
     return (
       <div className="flex justify-center items-center h-[70vh]">
@@ -185,8 +186,13 @@ export default function ProjectRequestInventoryPage() {
           >
             <option value="">All Warehouses</option>
             {warehouses.map((wh) => (
-              <option key={wh.id} value={wh.id}>
-                {wh.name}
+              <option
+                key={wh.id}
+                value={wh.id}
+                disabled={!wh.staff_id} // disable if no staff_id
+                className={!wh.staff_id ? "text-gray-400" : ""}
+              >
+                {wh.name}{!wh.staff_id ? " - Not Available" : ""}
               </option>
             ))}
           </select>

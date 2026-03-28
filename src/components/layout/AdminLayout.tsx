@@ -1,53 +1,92 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FiLogOut, FiMenu } from "react-icons/fi";
+import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
+import { useUpdatePassword } from "../../hooks/useUpdatePassword";
 import { navConfig } from "../../config/navConfig";
 import { Outlet } from "react-router-dom";
+import { PasswordField } from "../common/PasswordField";
 
 export default function AdminLayout() {
-  const { user, logoutUser } = useAuth();
+  const { user, logoutUser, adminApproval, updateProfileInfo } = useAuth(); // add updateUser
+  const { updatePassword } = useUpdatePassword();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profileSidebarOpen, setProfileSidebarOpen] = useState(false); // new
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+
+  console.log(dropdownOpen);
+  console.log(notifOpen);
+
+  const [profileForm, setProfileForm] = useState<{
+    name: string;
+    email: string;
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }>({
+    name: user?.name || "",
+    email: user?.email || "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  // Dummy notifications — replace with API later
-  const notifications = [
-    { id: 1, message: "New user registered", time: "2 min ago" },
-    { id: 2, message: "Warehouse item updated", time: "10 min ago" },
-    { id: 3, message: "Project approved by Admin", time: "1 hour ago" },
-    { id: 4, message: "Project approved by Admin", time: "1 hour ago" },
-    { id: 5, message: "Project approved by Admin", time: "1 hour ago" },
-  ];
-
-  console.log(notifOpen)
-  console.log(notifications)
   const handleLogout = () => {
     logoutUser();
     navigate("/login");
   };
 
-  // Close dropdowns when clicking outside
+  const handleProfileSave = async () => {
+    const success = await updateProfileInfo({
+      name: profileForm.name,
+      email: profileForm.email,
+    });
+
+    if (success) {
+      setProfileSidebarOpen(false); // only close if update succeeded
+    }
+    // otherwise sidebar stays open
+  };
+
+  const handlePasswordChangeSave = async () => {
+    const success = await updatePassword({
+      currentPassword: profileForm.currentPassword,
+      newPassword: profileForm.newPassword,
+      confirmPassword: profileForm.confirmPassword,
+    });
+
+    if (success) {
+      // ✅ Reset password fields after successful update
+      setProfileForm({
+        ...profileForm,
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      // 🔒 Close sidebar after successful password change
+      setProfileSidebarOpen(false);
+    }
+    // ❌ If update failed, do nothing — sidebar stays open
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
-      ) {
+      )
         setDropdownOpen(false);
-      }
-      if (
-        notifRef.current &&
-        !notifRef.current.contains(event.target as Node)
-      ) {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node))
         setNotifOpen(false);
-      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -60,55 +99,138 @@ export default function AdminLayout() {
     <div className="flex h-screen bg-neutralLight">
       {/* Sidebar (Desktop) */}
       <aside className="hidden md:flex md:flex-col md:w-64 bg-primary text-white p-6 space-y-6 shadow-lg">
-        <h2 className="text-2xl font-bold">Dashboard Panel</h2>
-        <nav className="flex flex-col space-y-3">
-          {links.map(({ label, icon: Icon, path }) => (
-            <Link
-              key={label}
-              to={path}
-              className={`flex items-center space-x-2 p-2 rounded hover:bg-primaryLight transition
-                ${
-                  location.pathname === path
-                    ? "bg-primaryLight text-white font-semibold"
-                    : "hover:bg-primaryLight"
-                }`}
-            >
-              <Icon /> <span>{label}</span>
-            </Link>
-          ))}
+        <div className="flex flex-col items-center border p-2 rounded-md border-primaryLight">
+          <img
+            src="/350x350.png"
+            alt="Warehouse"
+            className="w-20 mx-auto rounded-md"
+          />
+          {/* <h2 className="font-bold text-F3F4F6">CWMS</h2> */}
+          <h2 className="text-2xl font-bold uppercase">Dashboard</h2>
+        </div>
+        <nav className="flex-1 flex flex-col space-y-3">
+          {links.map(({ label, icon: Icon, path }) => {
+            const isDisabled =
+              adminApproval && label.toLowerCase() !== "dashboard";
+            if (isDisabled)
+              return (
+                <div
+                  key={label}
+                  className="flex items-center space-x-2 p-2 rounded opacity-50 cursor-not-allowed"
+                >
+                  <Icon />
+                  <span>{label}</span>
+                </div>
+              );
+            return (
+              <Link
+                key={label}
+                to={path}
+                className={`flex items-center space-x-2 p-2 rounded transition ${location.pathname === path ? "bg-primaryLight text-white font-semibold" : ""} hover:bg-primaryLight`}
+              >
+                <Icon />
+                <span>{label}</span>
+              </Link>
+            );
+          })}
         </nav>
+
+        {/* Profile + Logout */}
+        <div className="mt-auto flex flex-col space-y-3">
+          <button
+            onClick={() => setProfileSidebarOpen(true)}
+            className="flex items-center space-x-2 p-2 rounded hover:bg-primaryLight transition text-left"
+          >
+            <div className="w-8 h-8 rounded-full bg-white text-primary flex items-center justify-center font-semibold">
+              {user?.name
+                ? user.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()
+                : "U"}
+            </div>
+            <span>{user?.name || "Profile"}</span>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 p-2 rounded bg-red-600 hover:bg-red-700 transition"
+          >
+            <FiLogOut size={18} />
+            <span>Logout</span>
+          </button>
+        </div>
       </aside>
 
-      {/* Sidebar (Mobile) */}
+      {/* Mobile Sidebar */}
       <motion.div
         animate={{ x: sidebarOpen ? 0 : -250 }}
         className="fixed z-40 inset-y-0 left-0 w-64 bg-primary text-white p-6 flex flex-col space-y-6 shadow-lg md:hidden"
       >
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Dashboard Panel</h2>
+        <div className="mb-6 relative">
+          <div className="flex flex-col items-center border p-2 rounded-md border-primaryLight">
+            <img
+              src="/350x350.png"
+              alt="Warehouse"
+              className="w-20 mx-auto rounded-md"
+            />
+            {/* <h2 className="font-bold text-F3F4F6">CWMS</h2> */}
+            <h2 className="text-2xl font-bold uppercase">Dashboard</h2>
+          </div>
           <button
-            className="p-2 rounded hover:bg-primaryLight transition"
+            className="p-2 px-4 text-primary font-bold rounded hover:bg-error transition absolute -top-6 -right-6 bg-white"
             onClick={() => setSidebarOpen(false)}
           >
             ✕
           </button>
         </div>
-        <nav className="flex flex-col space-y-3">
-          {links.map(({ label, icon: Icon, path }) => (
-            <Link
-              key={label}
-              to={path}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center space-x-2 p-2 rounded hover:bg-primaryLight transition
-                ${
-                  location.pathname === path
-                    ? "bg-primaryLight text-white font-semibold"
-                    : "hover:bg-primaryLight"
-                }`}>
-              <Icon /> <span>{label}</span>
-            </Link>
-          ))}
+        <nav className="flex-1 flex flex-col space-y-3">
+          {links.map(({ label, icon: Icon, path }) => {
+            const isDisabled =
+              adminApproval && label.toLowerCase() !== "dashboard";
+            if (isDisabled)
+              return (
+                <div
+                  key={label}
+                  className="flex items-center space-x-2 p-2 rounded opacity-50 cursor-not-allowed"
+                >
+                  <Icon />
+                  <span>{label}</span>
+                </div>
+              );
+            return (
+              <Link
+                key={label}
+                to={path}
+                className={`flex items-center space-x-2 p-2 rounded transition ${location.pathname === path ? "bg-primaryLight text-white font-semibold" : ""} hover:bg-primaryLight`}
+              >
+                <Icon />
+                <span>{label}</span>
+              </Link>
+            );
+          })}
         </nav>
+
+        {/* Profile + Logout */}
+        <div className="mt-auto flex flex-col space-y-3">
+          <button
+            onClick={() => setProfileSidebarOpen(true)}
+            className="flex items-center space-x-2 p-2 rounded hover:bg-primaryLight transition text-left"
+          >
+            <div className="w-8 h-8 rounded-full bg-white text-primary flex items-center justify-center font-semibold">
+              {user?.name?.[0]?.toUpperCase() || "U"}
+            </div>
+            <span>{user?.name || "Profile"}</span>
+          </button>
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 p-2 rounded bg-red-700 hover:bg-red-800 transition"
+          >
+            <FiLogOut size={18} />
+            <span>Logout</span>
+          </button>
+        </div>
       </motion.div>
 
       {/* Overlay for mobile */}
@@ -119,9 +241,102 @@ export default function AdminLayout() {
         />
       )}
 
+      {/* Profile Sidebar */}
+      <AnimatePresence>
+        {profileSidebarOpen && (
+          <motion.div
+            key="profile-sidebar"
+            initial={{ x: -300 }}
+            animate={{ x: 0 }}
+            exit={{ x: -300 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-0 left-0 h-full w-80 bg-primary shadow-lg z-50 p-6 flex flex-col overflow-y-auto"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white px-3 py-1 rounded">
+                Edit Profile
+              </h2>
+              <button
+                onClick={() => setProfileSidebarOpen(false)}
+                className="p-2 rounded bg-neutralLight hover:bg-neutralLight transition"
+              >
+                <FiX color="red" size={20} />
+              </button>
+            </div>
+
+            <div className="flex flex-col space-y-4">
+              {/* Name & Email */}
+              <div>
+                <label className="text-sm text-neutralLight">Name</label>
+                <input
+                  type="text"
+                  value={profileForm.name}
+                  onChange={(e) =>
+                    setProfileForm({ ...profileForm, name: e.target.value })
+                  }
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-neutralLight">Email</label>
+                <input
+                  type="email"
+                  value={profileForm.email}
+                  onChange={(e) =>
+                    setProfileForm({ ...profileForm, email: e.target.value })
+                  }
+                  className="w-full p-2 border border-primary rounded focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <button
+                onClick={handleProfileSave}
+                className="bg-primaryLight text-white py-2 rounded hover:bg-primaryLight transition mt-4"
+              >
+                Save Changes
+              </button>
+
+              {/* Password Update */}
+              <div className="mt-4 border-t pt-4">
+                <h3 className="text-md font-semibold text-neutralLight mb-2">
+                  Update Password
+                </h3>
+                <PasswordField
+                  label="Current Password"
+                  value={profileForm.currentPassword || ""}
+                  onChange={(val) =>
+                    setProfileForm({ ...profileForm, currentPassword: val })
+                  }
+                />
+                <PasswordField
+                  label="New Password"
+                  value={profileForm.newPassword || ""}
+                  onChange={(val) =>
+                    setProfileForm({ ...profileForm, newPassword: val })
+                  }
+                />
+                <PasswordField
+                  label="Confirm Password"
+                  value={profileForm.confirmPassword || ""}
+                  onChange={(val) =>
+                    setProfileForm({ ...profileForm, confirmPassword: val })
+                  }
+                />
+              </div>
+              <button
+                onClick={handlePasswordChangeSave}
+                className="bg-primaryLight text-white py-2 rounded hover:bg-primaryLight transition mt-4"
+              >
+                Update Password
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Main content */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
         <header className="flex justify-between items-center p-4 bg-white shadow-md relative">
           <div className="flex items-center space-x-4">
             <button
@@ -132,131 +347,18 @@ export default function AdminLayout() {
             </button>
             <h1 className="text-2xl font-bold text-primary">CWMS Dashboard</h1>
           </div>
-
-          <div className="flex items-center space-x-6">
-            {/* 🔔 Notification */}
-            {/* <div className="relative" ref={notifRef}>
-              <button
-                onClick={() => setNotifOpen(!notifOpen)}
-                className="relative p-2 rounded-full hover:bg-neutralLight transition"
-              >
-                <FiBell size={22} className="text-primary" />
-                {notifications.length > 0 && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 200 }}
-                    className="absolute top-1 right-1 bg-error text-white text-xs px-1.5 py-0.5 rounded-full"
-                  >
-                    {notifications.length}
-                  </motion.span>
-                )}
-              </button>
-
-              <AnimatePresence>
-                {notifOpen && (
-                  <motion.div
-                    key="notif-popup"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-80 bg-white border border-neutralLight rounded-xl shadow-lg z-50 origin-top-right"
-                  >
-                    <div className="p-3 border-b border-neutralLight flex justify-between items-center">
-                      <h3 className="font-semibold text-primary">
-                        Notifications
-                      </h3>
-                      <button
-                        onClick={() => setNotifOpen(false)}
-                        className="text-sm text-neutralDark hover:text-error transition"
-                      >
-                        Close
-                      </button>
-                    </div>
-
-                    <motion.ul
-                      className="max-h-64 overflow-y-auto divide-y divide-neutralLight"
-                      initial="hidden"
-                      animate="show"
-                      variants={{
-                        hidden: {},
-                        show: {
-                          transition: {
-                            staggerChildren: 0.08,
-                          },
-                        },
-                      }}
-                    >
-                      {notifications.length > 0 ? (
-                        notifications.map((notif) => (
-                          <motion.li
-                            key={notif.id}
-                            variants={{
-                              hidden: { opacity: 0, y: 10 },
-                              show: { opacity: 1, y: 0 },
-                            }}
-                            className="p-3 hover:bg-neutralLight cursor-pointer"
-                          >
-                            <p className="text-sm text-neutralDark">
-                              {notif.message}
-                            </p>
-                            <span className="text-xs text-gray-500">
-                              {notif.time}
-                            </span>
-                          </motion.li>
-                        ))
-                      ) : (
-                        <li className="p-3 text-sm text-gray-500 text-center">
-                          No new notifications
-                        </li>
-                      )}
-                    </motion.ul>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div> */}
-
-            {/* 👤 Profile Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white font-semibold hover:bg-primaryLight transition"
-              >
-                {user?.name?.[0]?.toUpperCase() || "U"}
-              </button>
-
-              <AnimatePresence>
-                {dropdownOpen && (
-                  <motion.div
-                    key="profile-dropdown"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-60 bg-white border border-neutralLight rounded-xl shadow-lg p-4 z-50"
-                  >
-                    <p className="text-lg font-semibold text-primary">
-                      {user?.name}
-                    </p>
-                    <p className="text-sm text-neutralDark mb-3">
-                      {user?.email}
-                    </p>
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center justify-center space-x-2 w-full bg-error text-white py-2 rounded-lg hover:bg-red-600 transition"
-                    >
-                      <FiLogOut /> <span>Logout</span>
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
         </header>
 
-        {/* Page Content */}
-        <main className="p-4 flex-1 overflow-auto"><Outlet /> {/* renders the nested page */}</main>
+        {adminApproval && (
+          <div className="bg-yellow-100 text-yellow-800 px-4 py-2 text-center font-medium">
+            Your account is not yet assigned to an organization. You can only
+            access the Dashboard.
+          </div>
+        )}
+
+        <main className="p-4 flex-1 overflow-auto">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

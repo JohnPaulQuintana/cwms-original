@@ -89,19 +89,21 @@ export default function ProjectModal({
             onChange={(e) => handleChange("location", e.target.value)}
             className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
           />
-          <select
-            value={formData.manager_id}
-            onChange={(e) =>
-              handleChange("manager_id", Number(e.target.value))
-            }
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
-          >
-            {managers.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name} ({m.email})
-              </option>
-            ))}
-          </select>
+          {managers.length > 0 && (
+            <select
+              value={formData.manager_id}
+              onChange={(e) =>
+                handleChange("manager_id", Number(e.target.value))
+              }
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+            >
+              {managers.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} ({m.email})
+                </option>
+              ))}
+            </select>
+          )}
           <input
             type="date"
             value={formData.start_date}
@@ -131,8 +133,8 @@ export default function ProjectModal({
             {processing
               ? "Saving..."
               : mode === "add"
-              ? "Add Project"
-              : "Update Project"}
+                ? "Add Project"
+                : "Update Project"}
           </button>
         </div>
       </div>

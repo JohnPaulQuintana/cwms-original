@@ -168,7 +168,7 @@ export default function ProjectPage() {
             placeholder="Search by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:w-64 p-2 border border-neutralLight rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full sm:w-64 p-2 border border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <button
             onClick={handleAdd}

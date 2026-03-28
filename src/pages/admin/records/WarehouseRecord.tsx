@@ -402,7 +402,7 @@ export default function WarehouseRecord() {
               <motion.div
                 key={rec.id}
                 whileHover={{ scale: 1.03 }}
-                className="border rounded-md shadow-md p-5 bg-white transition-all duration-200"
+                className="border border-primary rounded-md shadow-md p-5 bg-white transition-all duration-200"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-3 border-b-2 pb-2">

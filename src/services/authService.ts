@@ -7,7 +7,14 @@ interface LoginResponse {
   success: boolean;
   type: string;
   message: string;
-  data: { user: any; token: string } | null;
+  data: { user: any; token: string; admin_approval: boolean; } | null;
+}
+
+interface RegisterResponse {
+  success: boolean;
+  type: string;
+  message: string;
+  data: any | null;
 }
 
 // const axiosClient = axios.create({
@@ -42,6 +49,37 @@ export async function forgotPassword(email: string) {
     return data.message || "Password reset link sent!";
   } catch (err: any) {
     const message = err.response?.data?.message || err.message || "Failed to send reset link";
+    throw new Error(message);
+  }
+}
+
+export async function register(
+  name: string,
+  email: string,
+  password: string,
+  role: string
+) {
+  try {
+    const { data } = await axios.post<RegisterResponse>(
+      `${API_URL}/register/user`,
+      {
+        name,
+        email,
+        password,
+        role, // important
+      }
+    );
+    
+    if (!data.success) {
+      throw new Error(data.message || "Registration failed");
+    }
+
+    return data;
+  } catch (err: any) {
+    const message =
+      err.response?.data?.message ||
+      err.message ||
+      "Registration failed";
     throw new Error(message);
   }
 }

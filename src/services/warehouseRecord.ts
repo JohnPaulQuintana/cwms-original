@@ -13,7 +13,7 @@ export async function getWarehouseRecordRequests(
   id: number
 ): Promise<WarehouseRecordRequestsResponse> {
   const { data } = await axios.get<WarehouseRecordRequestsResponse>(
-    `${API_URL}/locations/${id}/records/?page=${page}`,
+    `${API_URL}/locations/${id}/records?page=${page}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

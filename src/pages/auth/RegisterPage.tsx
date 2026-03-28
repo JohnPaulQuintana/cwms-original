@@ -77,7 +77,7 @@ export default function RegisterPage() {
             <img
               src="/350x350.png"
               alt="Warehouse"
-              className="w-60 mx-auto mb-6 drop-shadow-lg"
+              className="w-60 mx-auto mb-6 drop-shadow-lg rounded-md"
             />
             <h2 className="text-4xl font-bold mb-3">Warehouse Monitoring</h2>
             <p className="opacity-90">Track. Manage. Optimize operations.</p>
@@ -90,7 +90,7 @@ export default function RegisterPage() {
             <img
               src="/350x350.png"
               alt="Warehouse"
-              className="w-40 mx-auto mb-4 drop-shadow-lg"
+              className="w-40 mx-auto mb-4 drop-shadow-lg rounded-md"
             />
             <h2 className="text-2xl font-bold mb-1">Warehouse Monitoring</h2>
             <p className="text-sm opacity-90">

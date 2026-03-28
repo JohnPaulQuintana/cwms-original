@@ -89,7 +89,7 @@ export default function LoginPage() {
             <img
               src="/350x350.png"
               alt="Warehouse"
-              className="w-60 mx-auto mb-6"
+              className="w-60 mx-auto mb-6 rounded-md"
             />
             <h2 className="text-4xl font-bold mb-3">Warehouse Monitoring</h2>
             <p className="opacity-90">Track. Manage. Optimize operations.</p>
@@ -102,7 +102,7 @@ export default function LoginPage() {
             <img
               src="/350x350.png"
               alt="Warehouse"
-              className="w-40 mx-auto mb-4"
+              className="w-40 mx-auto mb-4 rounded-md"
             />
             <h2 className="text-2xl font-bold mb-1">Warehouse Monitoring</h2>
             <p className="opacity-90">Track. Manage. Optimize operations.</p>

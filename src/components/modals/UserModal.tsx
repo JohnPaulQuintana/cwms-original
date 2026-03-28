@@ -100,7 +100,7 @@ export default function UserModal({
             onChange={(e) => handleChange("role", e.target.value)}
             className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
           >
-            <option value="admin">Admin</option>
+            {/* <option value="admin">Admin</option> */}
             <option value="warehouse_staff">Warehouse Staff</option>
             <option value="project_manager">Project Manager</option>
           </select>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiUser } from "react-icons/fi";
 import { motion } from "framer-motion";
 import AuthLayout from "../../components/layout/AuthLayout";
@@ -22,7 +22,7 @@ export default function RegisterPage() {
     null,
   );
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

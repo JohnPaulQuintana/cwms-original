@@ -17,6 +17,8 @@ export const navConfig = {
     { label: "Users", icon: FiUsers, path: "/dashboard/admin/users" },
     { label: "Projects", icon: FiFolder, path: "/dashboard/admin/project" },
     { label: "Warehouses", icon: FiLayers, path: "/dashboard/admin/warehouse" },
+    { label: "Inventory", icon: FiPackage, path: "/dashboard/admin/inventory" },
+    { label: "Request", icon: FiClipboard, path: "/dashboard/admin/inventory/request" },
   ],
 
   project_manager: [
@@ -32,5 +34,6 @@ export const navConfig = {
     { label: "Shipment", icon: FiTruck, path: "/dashboard/warehouse/shipment" },
     { label: "Request", icon: FiClipboard, path: "/dashboard/warehouse/inventory/request" },
     { label: "Defected", icon: FiAlertTriangle, path: "/dashboard/warehouse/inventory/defected" },
+    { label: "Returned", icon: FiAlertTriangle, path: "/dashboard/warehouse/inventory/returned" },
   ],
 };

@@ -20,7 +20,7 @@ export default function WarehouseInventoryRequestsPage() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [selectedRequestId, setSelectedRequestId] = useState<number | null>(
-    null
+    null,
   );
 
   // load requests on mount
@@ -60,7 +60,7 @@ export default function WarehouseInventoryRequestsPage() {
   async function handleAction(
     requestId: number,
     action: "approved" | "rejected",
-    reason?: string
+    reason?: string,
   ) {
     try {
       if (!token) return;
@@ -68,7 +68,7 @@ export default function WarehouseInventoryRequestsPage() {
         token,
         requestId,
         action,
-        reason
+        reason,
       );
       showToast(res.message, "success");
       await loadRequests();
@@ -107,24 +107,26 @@ export default function WarehouseInventoryRequestsPage() {
         <table className="w-full border-collapse">
           <thead className="bg-neutralLight text-left">
             <tr>
-              <th className="p-3 text-sm font-medium">#</th>
-              <th className="p-3 text-sm font-medium">Project Name</th>
-              <th className="p-3 text-sm font-medium hidden sm:table-cell">
+              <th className="w-[50px] p-3 text-sm font-medium">#</th>
+              <th className="w-[100px] p-3 text-sm font-medium">
+                Project Name
+              </th>
+              <th className="w-[100px] p-3 text-sm font-medium hidden sm:table-cell">
                 Project Manager
               </th>
-              <th className="p-3 text-sm font-medium hidden md:table-cell">
+              <th className="w-[100px] p-3 text-sm font-medium hidden md:table-cell">
                 Project Location
               </th>
-              <th className="p-3 text-sm font-medium hidden lg:table-cell">
+              <th className="w-[100px] p-3 text-sm font-medium hidden lg:table-cell">
                 Inventory Item
               </th>
-              <th className="p-3 text-sm font-medium hidden lg:table-cell">
+              <th className="w-[100px] p-3 text-sm font-medium hidden lg:table-cell">
                 Available Stocks
               </th>
-              <th className="p-3 text-sm font-medium hidden md:table-cell">
+              <th className="w-[100px] p-3 text-sm font-medium hidden md:table-cell">
                 Requested Quantity
               </th>
-              <th className="p-3 text-sm font-medium hidden md:table-cell">
+              <th className="w-[100px] p-3 text-sm font-medium hidden md:table-cell">
                 Status
               </th>
               <th className="p-3 text-sm font-medium hidden lg:table-cell">
@@ -156,21 +158,42 @@ export default function WarehouseInventoryRequestsPage() {
                     {req.requested_qty}
                   </td>
                   <td
-                    className={`p-3 text-sm hidden md:table-cell font-semibold ${
-                      req.status === "approved"
-                        ? "text-green-600"
-                        : req.status === "pending"
-                        ? "text-yellow-600"
-                        : "text-red-600"
-                    }`}
+                    className={`text-white hidden md:table-cell font-semibold`}
                   >
-                    {req.status}
+                    <span
+                      className={`${
+                        req.status === "approved"
+                          ? "bg-green-600 p-1 px-2 rounded-xl text-xs"
+                          : req.status === "pending"
+                            ? "bg-yellow-600 p-1 px-2 rounded-xl text-xs"
+                            : ""
+                      }`}
+                    >
+                      {req.status}
+                    </span>
                   </td>
                   <td className="p-3 text-sm hidden lg:table-cell">
                     {new Date(req.created_at).toLocaleDateString()}
                   </td>
-                  <td className="p-3 text-center flex items-center justify-center gap-2">
-                    {/* Approve */}
+                  <td className="p-3 text-center">
+                    <span
+                      className={`text-white px-2 py-1 rounded-full text-xs font-medium ${
+                        req.status === "approved"
+                          ? "bg-green-600 p-1 px-2 rounded-xl text-xs"
+                          : req.status === "pending"
+                            ? "bg-yellow-600 p-1 px-2 rounded-xl text-xs"
+                            : ""
+                      }`}
+                    >
+                      {req.status === "approved"
+                        ? "Approved by Admin"
+                        : req.status === "rejected"
+                          ? "Rejected by Admin"
+                          : "Pending Approval"}
+                    </span>
+                  </td>
+                  {/* <td className="p-3 text-center flex items-center justify-center gap-2">
+                    
                     <div className="relative group">
                       <button
                         onClick={() => handleAction(req.id, "approved")}
@@ -192,7 +215,7 @@ export default function WarehouseInventoryRequestsPage() {
                       </span>
                     </div>
 
-                    {/* Reject */}
+                    
                     <div className="relative group">
                       <button
                         onClick={() => confirmReject(req.id)}
@@ -213,7 +236,7 @@ export default function WarehouseInventoryRequestsPage() {
                         Reject
                       </span>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               ))
             ) : (

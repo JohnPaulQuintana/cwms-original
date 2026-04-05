@@ -73,7 +73,12 @@ export default function InventoryStaffPage() {
 
     setLoading(true);
     try {
-      const res = await fetchInventoryStaff(token, page, debouncedSearch, selectedWarehouse);
+      const res = await fetchInventoryStaff(
+        token,
+        page,
+        debouncedSearch,
+        selectedWarehouse,
+      );
       setInventory(res.data.data);
       setTotalPages(res.data.last_page);
       setError("");
@@ -231,6 +236,9 @@ export default function InventoryStaffPage() {
               <th className="p-3 font-medium">Name</th>
               <th className="p-3 font-medium hidden sm:table-cell">SKU</th>
               <th className="p-3 font-medium hidden md:table-cell">Quantity</th>
+              <th className="p-3 font-medium hidden md:table-cell">
+                Reordered Qty
+              </th>
               <th className="p-3 font-medium hidden lg:table-cell">Unit</th>
               <th className="p-3 font-medium hidden xl:table-cell">Location</th>
               <th className="p-3 font-medium hidden 2xl:table-cell">Created</th>
@@ -244,7 +252,56 @@ export default function InventoryStaffPage() {
                   <td className="p-3">{(page - 1) * 10 + i + 1}</td>
                   <td className="p-3 font-medium">{item.name}</td>
                   <td className="p-3 hidden sm:table-cell">{item.sku}</td>
-                  <td className="p-3 hidden md:table-cell">{item.quantity}</td>
+                  {/* <td className="p-3 hidden md:table-cell">{item.quantity}</td> */}
+                  <td className="p-3 hidden md:table-cell">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`${
+                          item.quantity === 0
+                            ? "text-red-700"
+                            : item.quantity <= 10
+                              ? "text-yellow-700"
+                              : "text-green-700"
+                        }`}
+                      >
+                        {item.quantity}
+                      </span>
+                      
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          item.quantity === 0
+                            ? "bg-red-100 text-red-700"
+                            : item.quantity <= 10
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {item.quantity === 0
+                          ? "Out of Stock"
+                          : item.quantity <= 10
+                            ? "Low"
+                            : "In Stock"}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-3 hidden md:table-cell text-center">
+                    {item.reorder_quantity > 0 ? (
+                      <div className="flex flex-col items-center text-xs">
+                        <span className="font-semibold text-blue-700">
+                          {item.reorder_quantity}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                          Ordered
+                        </span>
+                      </div>
+                    ) : item.quantity === 0 ? (
+                      <span className="text-red-600 text-xs font-medium">
+                        Needs Order
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">—</span>
+                    )}
+                  </td>
                   <td className="p-3 hidden lg:table-cell">{item.unit}</td>
                   <td className="p-3 hidden xl:table-cell">
                     {item.location?.name || "—"}

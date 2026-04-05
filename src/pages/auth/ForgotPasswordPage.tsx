@@ -27,8 +27,8 @@ export default function ForgotPasswordPage() {
               alt="Warehouse"
               className="w-60 mx-auto mb-6 drop-shadow-lg"
             />
-            <h2 className="text-4xl font-bold mb-3">Warehouse Monitoring</h2>
-            <p className="opacity-90">Track. Manage. Optimize operations.</p>
+            <h2 className="text-4xl font-bold mb-3"><span className="text-3xl lowercase">i</span>bodegero</h2>
+            <p className="opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
           </div>
         </div>
 
@@ -40,8 +40,8 @@ export default function ForgotPasswordPage() {
               alt="Warehouse"
               className="w-40 mx-auto mb-4 drop-shadow-lg"
             />
-            <h2 className="text-2xl font-bold mb-1">Warehouse Monitoring</h2>
-            <p className="text-sm opacity-90">Track. Manage. Optimize operations.</p>
+            <h2 className="text-2xl font-bold mb-1"><span className="text-3xl lowercase">i</span>bodegero</h2>
+            <p className="text-sm opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
           </div>
         </div>
 
@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full pl-10 pr-3 py-3 border border-neutralLight rounded-xl focus:outline-none focus:ring-2 focus:ring-primaryLight transition shadow-sm"
+                  className="w-full pl-10 pr-3 py-3 border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primaryLight transition shadow-sm"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required

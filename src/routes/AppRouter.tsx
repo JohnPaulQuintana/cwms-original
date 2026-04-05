@@ -20,12 +20,14 @@ import ProjectPage from "../pages/admin/ProjectPage";
 import ProjectManagerPage from "../pages/manager/ProjectManagerPage";
 import ProjectRequestInventoryPage from "../pages/manager/ProjectRequestInventoryPage";
 import ProjectInventoryRequestsPage from "../pages/manager/ProjectInventoryRequestsPage";
+import ProjectInventoryRequestsAdminPage from "../pages/admin/ProjectInventoryRequestsPage";
 import WarehouseInventoryRequestsPage from "../pages/staff/WarehouseRequestInventory";
 import ShipmentsPage from "../pages/staff/ShipmentsPage";
 import ProjectShipmentsPage from "../pages/manager/ProjectShipmentsPage";
 import DefectedPage from "../pages/staff/DefectedPage";
 import WarehouseRecord from "../pages/admin/records/WarehouseRecord";
 import RegisterPage from "../pages/auth/RegisterPage";
+import ReturnedPage from "../pages/staff/ReturnedPage";
 export default function AppRouter() {
   return (
     <BrowserRouter>
@@ -75,6 +77,7 @@ export default function AppRouter() {
             <Route path="warehouse" element={<WarehousePage />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="records" element={<WarehouseRecord />} />
+            <Route path="inventory/request" element={<ProjectInventoryRequestsAdminPage />} />
           </Route>
 
           {/* Other Roles */}
@@ -90,6 +93,7 @@ export default function AppRouter() {
             <Route path="inventory/request" element={<WarehouseInventoryRequestsPage />}></Route>
             <Route path="shipment" element={<ShipmentsPage />}></Route>
             <Route path="inventory/defected" element={<DefectedPage />}></Route>
+            <Route path="inventory/returned" element={<ReturnedPage />}></Route>
           </Route>
 
           <Route

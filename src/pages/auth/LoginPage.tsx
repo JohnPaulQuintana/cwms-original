@@ -89,10 +89,10 @@ export default function LoginPage() {
             <img
               src="/350x350.png"
               alt="Warehouse"
-              className="w-60 mx-auto mb-6 rounded-md"
+              className="w-60 mx-auto rounded-md"
             />
-            <h2 className="text-4xl font-bold mb-3">Warehouse Monitoring</h2>
-            <p className="opacity-90">Track. Manage. Optimize operations.</p>
+            <h2 className="text-4xl font-bold mb-3 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2>
+            <p className="opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
           </div>
         </div>
 
@@ -104,8 +104,8 @@ export default function LoginPage() {
               alt="Warehouse"
               className="w-40 mx-auto mb-4 rounded-md"
             />
-            <h2 className="text-2xl font-bold mb-1">Warehouse Monitoring</h2>
-            <p className="opacity-90">Track. Manage. Optimize operations.</p>
+            <h2 className="text-2xl font-bold mb-1 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2>
+            <p className="opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
           </div>
         </div>
 
@@ -134,7 +134,7 @@ export default function LoginPage() {
                 <input
                   type="email"
                   placeholder="Email"
-                  className="w-full pl-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full pl-10 py-3 border border-primary rounded-xl focus:ring-2 focus:ring-primary outline-none"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -150,7 +150,7 @@ export default function LoginPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
-                  className="w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full pl-10 pr-10 py-3 border border-primary rounded-xl focus:ring-2 focus:ring-primary outline-none"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

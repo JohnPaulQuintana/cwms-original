@@ -230,8 +230,8 @@ export default function UsersPage() {
                     <span
                       className={
                         user.is_active
-                          ? "text-green-600 font-semibold"
-                          : "text-red-600 font-semibold"
+                          ? "text-white bg-green-600 p-1 px-2 rounded-xl font-semibold"
+                          : "text-white bg-red-600 p-1 px-2 rounded-xl font-semibold"
                       }
                     >
                       {user.is_active ? "Active" : "Inactive"}

@@ -1,24 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FiEdit, FiTrash2, FiInfo } from "react-icons/fi";
+import { FiInfo, FiCheck, FiX } from "react-icons/fi";
 
 import { useAuth } from "../../hooks/useAuth";
 import {
   fetchInventoryRequests,
-  deleteInventoryRequest,
-  editInventoryRequest,
-  returnInventoryRequest,
 } from "../../services/inventoryService";
-import { fetchMyProjects } from "../../services/projectService";
+import { fetchProjects } from "../../services/projectService";
 import { showToast } from "../../utils/toast";
-// import { div } from "framer-motion/client";
-
-type ReturnedItem = {
-  id: number;
-  quantity: number;
-  status: "pending" | "approved"; // returned status
-  created_at: string;
-};
+import { updateInventoryRequestStatus } from "../../services/inventoryRequest";
 
 type InventoryRequest = {
   id: number;
@@ -31,7 +21,6 @@ type InventoryRequest = {
   project_name: string;
   status: string;
   reject_reason?: string;
-  returned_items?: ReturnedItem[];
 };
 
 type Project = {
@@ -57,18 +46,17 @@ export default function ProjectInventoryRequestsPage() {
   const statusOptions = ["pending", "approved", "rejected"];
 
   // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
-  const [editQty, setEditQty] = useState<number>(0);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [editId, setEditId] = useState<number | null>(null);
+  // const [editQty, setEditQty] = useState<number>(0);
 
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
   const [selectedRequest, setSelectedRequest] =
     useState<InventoryRequest | null>(null);
-
-  const [returnModalOpen, setReturnModalOpen] = useState(false);
-  const [returnRequest, setReturnRequest] = useState<InventoryRequest | null>(
+  const [selectedRequestId, setSelectedRequestId] = useState<number | null>(
     null,
   );
-  const [returnQty, setReturnQty] = useState<number>(0);
 
   useEffect(() => {
     loadProjects();
@@ -85,7 +73,7 @@ export default function ProjectInventoryRequestsPage() {
   const loadProjects = async () => {
     if (!token) return;
     try {
-      const res = await fetchMyProjects(token);
+      const res = await fetchProjects(token);
       setProjects(res.data.data);
     } catch (err: any) {
       showToast(err.message || "Failed to load projects", "error");
@@ -124,50 +112,33 @@ export default function ProjectInventoryRequestsPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!token) return;
-    try {
-      await deleteInventoryRequest(token, id);
-      setRequests((prev) => prev.filter((r) => r.id !== id));
-      showToast("Request deleted successfully", "success");
-    } catch (err: any) {
-      showToast(err.message || "Failed to delete request", "error");
-    }
+
+  const confirmReject = (id: number) => {
+    setSelectedRequestId(id);
+    setShowRejectModal(true);
   };
 
-  const handleEdit = (id: number, qty: number) => {
-    setEditId(id);
-    setEditQty(qty);
-    setIsModalOpen(true);
-  };
-
-  const handleSaveEdit = async () => {
-    if (!token || editId === null) return;
+  async function handleAction(
+    requestId: number,
+    action: "approved" | "rejected",
+    reason?: string,
+  ) {
     try {
-      await editInventoryRequest(token, editId, { requested_qty: editQty });
-      setRequests((prev) =>
-        prev.map((r) =>
-          r.id === editId ? { ...r, requested_qty: editQty } : r,
-        ),
+      if (!token) return;
+      const res = await updateInventoryRequestStatus(
+        token,
+        requestId,
+        action,
+        reason,
       );
-      showToast("Quantity updated successfully", "success");
-      setIsModalOpen(false);
+      showToast(res.message, "success");
+      await loadRequests();
+      setShowRejectModal(false);
+      setRejectReason("");
     } catch (err: any) {
-      showToast(err.message || "Failed to update quantity", "error");
+      showToast(err.message || "Action failed", "error");
     }
-  };
-
-  const handleReturnClick = (req: InventoryRequest) => {
-    setReturnRequest(req);
-    setReturnQty(req.requested_qty); // default to full quantity
-    setReturnModalOpen(true);
-  };
-
-  const maxReturnableQty = returnRequest
-    ? returnRequest.requested_qty -
-      (returnRequest.returned_items?.reduce((sum, r) => sum + r.quantity, 0) ||
-        0)
-    : 0;
+  }
 
   if (loading)
     return (
@@ -296,7 +267,16 @@ export default function ProjectInventoryRequestsPage() {
                           : "text-red-600"
                     }`}
                   >
+                    <span className={`text-white ${
+                        req.status === "approved"
+                          ? "bg-green-600 p-1 px-2 rounded-xl text-xs"
+                          : req.status === "pending"
+                            ? "bg-yellow-600 p-1 px-2 rounded-xl text-xs"
+                            : ""
+                      }`}>
                     {req.status}
+
+                    </span>
                   </td>
                   <td className="p-3 text-sm hidden lg:table-cell">
                     {new Date(req.created_at).toLocaleString()}
@@ -306,83 +286,40 @@ export default function ProjectInventoryRequestsPage() {
                     <div className="flex justify-center gap-2">
                       {req.status === "pending" ? (
                         <>
-                          {/* Edit */}
                           <div className="relative group">
                             <button
-                              onClick={() =>
-                                handleEdit(req.id, req.requested_qty)
-                              }
-                              className="text-blue-500 hover:text-blue-700 transition-colors border p-1 rounded-md border-blue-700"
+                              onClick={() => handleAction(req.id, "approved")}
+                              className="p-1 rounded-full text-white transition bg-green-600 hover:bg-green-700"
                             >
-                              <FiEdit size={16} />
+                              <FiCheck size={12} />
                             </button>
-                            <span
-                              className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
-        bg-gray-800 text-white text-xs rounded py-1 px-2 
-        opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                            >
-                              Edit
-                            </span>
                           </div>
 
-                          {/* Delete */}
                           <div className="relative group">
                             <button
-                              onClick={() => handleDelete(req.id)}
-                              className="text-red-500 hover:text-red-700 transition-colors border p-1 rounded-md border-red-500"
+                              onClick={() => confirmReject(req.id)}
+                              className="p-1 rounded-full text-white transition bg-red-600 hover:bg-red-700"
                             >
-                              <FiTrash2 size={16} />
+                              <FiX size={12} />
                             </button>
-                            <span
-                              className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
-        bg-gray-800 text-white text-xs rounded py-1 px-2 
-        opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                            >
-                              Delete
-                            </span>
                           </div>
                         </>
                       ) : (
-                        // Approved or Rejected
-                        <div className="flex gap-2 justify-center">
-                          {/* Details Button */}
-                          <div className="relative group">
-                            <button
-                              onClick={() => handleDetails(req)}
-                              className="text-gray-700 hover:text-gray-900 transition-colors border p-1 rounded-md border-gray-600"
-                            >
-                              <FiInfo size={16} />
-                            </button>
-                            <span
-                              className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
-        bg-gray-800 text-white text-xs rounded py-1 px-2 
-        opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                            >
-                              Details
-                            </span>
-                          </div>
-
-                          {/* Return button only for approved requests */}
-                          {req.status === "approved" && (
-                            <div className="relative group">
-                              <button
-                                onClick={async () => {
-                                  handleReturnClick(req);
-                                  await loadRequests();
-                                }}
-                                className="text-yellow-500 hover:text-yellow-700 transition-colors border p-1 rounded-md border-yellow-500"
-                              >
-                                Return
-                              </button>
-                              <span
-                                className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
-      bg-gray-800 text-white text-xs rounded py-1 px-2 
-      opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                              >
-                                Return
-                              </span>
-                            </div>
-                          )}
+                        // ✅ Details Button if Approved or Rejected
+                        <div className="relative group">
+                          <button
+                            onClick={() => handleDetails(req)} // open modal or navigate to details page
+                            className="text-gray-700 hover:text-gray-900 transition-colors border p-1 rounded-md border-gray-600"
+                          >
+                            <FiInfo size={16} />
+                          </button>
+                          <span
+                            className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
+            bg-gray-800 text-white text-xs rounded py-1 px-2 
+            opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                          >
+                            Details
+                          </span>
                         </div>
                       )}
                     </div>
@@ -427,39 +364,40 @@ export default function ProjectInventoryRequestsPage() {
         </button>
       </div>
 
-      {/* Edit Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md"
-          >
-            <h2 className="text-xl font-semibold mb-4 text-primary">
-              Edit Quantity
+      {/* Reject Modal */}
+      {showRejectModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-semibold mb-3 text-red-600">
+              Reject Inventory Request
             </h2>
-            <input
-              type="number"
-              value={editQty}
-              onChange={(e) => setEditQty(Number(e.target.value))}
-              className="w-full border rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
-              min={1}
+            <textarea
+              placeholder="Enter reason for rejection..."
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              className="w-full border rounded p-2 h-24 focus:outline-none focus:ring-2 focus:ring-red-500"
             />
-            <div className="flex justify-end gap-2">
+            <div className="mt-4 flex justify-end gap-2">
               <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400"
+                onClick={() => setShowRejectModal(false)}
+                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
               >
                 Cancel
               </button>
               <button
-                onClick={handleSaveEdit}
-                className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark"
+                onClick={() => {
+                  if (!rejectReason.trim()) {
+                    showToast("Please provide a reason.", "error");
+                    return;
+                  }
+                  handleAction(selectedRequestId!, "rejected", rejectReason);
+                }}
+                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
               >
-                Save
+                Submit
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
 
@@ -529,140 +467,6 @@ export default function ProjectInventoryRequestsPage() {
                 Close
               </button>
             </div>
-          </motion.div>
-        </div>
-      )}
-
-      {returnModalOpen && returnRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md"
-          >
-            <h2 className="text-xl font-semibold mb-4 text-primary">
-              Return Item
-            </h2>
-
-            <p className="mb-2">
-              <strong>Item:</strong> {returnRequest.inventory_name}
-            </p>
-            <p className="mb-4">
-              <strong>Project:</strong> {returnRequest.project_name}
-            </p>
-
-            <input
-              type="number"
-              min={1}
-              // max={returnRequest.requested_qty}
-              max={maxReturnableQty}
-              value={returnQty}
-              onChange={(e) => {
-                const val = Number(e.target.value);
-                // make sure it doesn't go above max
-                setReturnQty(Math.min(Math.max(val, 1), maxReturnableQty));
-              }}
-              className="w-full border rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <p className="text-xs text-gray-500">
-              Max returnable quantity: {maxReturnableQty}
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setReturnModalOpen(false)}
-                className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  if (!returnRequest) return;
-                  // Calculate remaining returnable quantity
-                  const alreadyReturned =
-                    returnRequest.returned_items?.reduce(
-                      (sum, r) => sum + r.quantity,
-                      0,
-                    ) || 0;
-                  const maxReturnableQty =
-                    returnRequest.requested_qty - alreadyReturned;
-
-                  if (returnQty < 1 || returnQty > maxReturnableQty) {
-                    showToast(
-                      `You can return only 1 to ${maxReturnableQty} items`,
-                      "error",
-                    );
-                    return;
-                  }
-
-                  try {
-                    console.log(returnRequest, returnQty);
-                    if (!token) return; // skip if not logged in
-                    await returnInventoryRequest(token, {
-                      inventory_request_id: returnRequest.id,
-                      inventory_name: returnRequest.inventory_name,
-                      project_id: returnRequest.project_id,
-                      warehouse_name: returnRequest.warehouse_name,
-                      quantity: returnQty,
-                      unit: returnRequest.unit,
-                    });
-                    showToast(
-                      `Return processed for ${returnRequest.inventory_name}`,
-                      "success",
-                    );
-                    setReturnModalOpen(false);
-                    // Optional: refresh the list or update local state
-                    await loadRequests();
-                  } catch (err: any) {
-                    showToast(
-                      err.message || "Failed to process return",
-                      "error",
-                    );
-                  }
-                }}
-                className="px-4 py-2 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600"
-              >
-                Confirm Return
-              </button>
-            </div>
-
-            {returnRequest.returned_items &&
-              returnRequest.returned_items.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="font-semibold mb-3 text-lg text-primary">
-                    Returned History
-                  </h3>
-                  <ul className="text-sm border rounded-lg p-3 max-h-48 overflow-y-auto bg-gray-50">
-                    {returnRequest.returned_items.map((r) => (
-                      <li
-                        key={r.id}
-                        className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0 border-b last:border-b-0 py-2 px-1 hover:bg-gray-100 transition-colors rounded-md"
-                      >
-                        <span className="font-medium">Qty: {r.quantity}</span>
-
-                        <span className="flex items-center gap-2">
-                          Status:
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-white font-semibold text-xs ${
-                              r.status === "approved"
-                                ? "bg-green-600"
-                                : r.status === "pending"
-                                  ? "bg-yellow-500"
-                                  : "bg-gray-500"
-                            }`}
-                          >
-                            {r.status.charAt(0).toUpperCase() +
-                              r.status.slice(1)}
-                          </span>
-                        </span>
-
-                        <span className="text-gray-500 text-xs sm:text-sm">
-                          {new Date(r.created_at).toLocaleString()}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
           </motion.div>
         </div>
       )}

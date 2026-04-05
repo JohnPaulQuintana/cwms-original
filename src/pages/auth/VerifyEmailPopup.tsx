@@ -72,7 +72,7 @@ export default function VerifyEmailPopup({ isOpen, onClose, onVerify }: VerifyEm
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full pl-10 pr-3 py-3 border border-neutralLight rounded-xl focus:outline-none focus:ring-2 focus:ring-primaryLight transition shadow-sm"
+                  className="w-full pl-10 pr-3 py-3 border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primaryLight transition shadow-sm"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required

@@ -2,10 +2,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-console.log = () => {};
+// console.log = () => {};
 // console.warn = () => {};
 // console.error = () => {};
-console.debug = () => {};
+// console.debug = () => {};
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <App />

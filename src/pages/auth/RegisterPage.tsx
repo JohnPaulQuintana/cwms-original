@@ -79,8 +79,8 @@ export default function RegisterPage() {
               alt="Warehouse"
               className="w-60 mx-auto mb-6 drop-shadow-lg rounded-md"
             />
-            <h2 className="text-4xl font-bold mb-3">Warehouse Monitoring</h2>
-            <p className="opacity-90">Track. Manage. Optimize operations.</p>
+            <h2 className="text-4xl font-bold mb-3 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2>
+            <p className="opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
           </div>
         </div>
 
@@ -92,9 +92,9 @@ export default function RegisterPage() {
               alt="Warehouse"
               className="w-40 mx-auto mb-4 drop-shadow-lg rounded-md"
             />
-            <h2 className="text-2xl font-bold mb-1">Warehouse Monitoring</h2>
+            <h2 className="text-2xl font-bold mb-1 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2>
             <p className="text-sm opacity-90">
-              Track. Manage. Optimize operations.
+              Track stocks. Monitor movement. Optimize workflow.
             </p>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function RegisterPage() {
                 <input
                   type="text"
                   placeholder="Name"
-                  className="w-full pl-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full pl-10 py-3 border border-primary rounded-xl focus:ring-2 focus:ring-primary outline-none"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -140,7 +140,7 @@ export default function RegisterPage() {
                 <input
                   type="email"
                   placeholder="Email"
-                  className="w-full pl-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full pl-10 py-3 border border-primary rounded-xl focus:ring-2 focus:ring-primary outline-none"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -156,7 +156,7 @@ export default function RegisterPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
-                  className="w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full pl-10 pr-10 py-3 border border-primary rounded-xl focus:ring-2 focus:ring-primary outline-none"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -178,7 +178,7 @@ export default function RegisterPage() {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
-                  className="w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full pl-10 pr-10 py-3 border border-primary rounded-xl focus:ring-2 focus:ring-primary outline-none"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -202,7 +202,7 @@ export default function RegisterPage() {
                   size={20}
                 />
                 <select
-                  className="w-full pl-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full pl-10 py-3 border border-primary rounded-xl focus:ring-2 focus:ring-primary outline-none"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                 >

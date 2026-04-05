@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FiCheck, FiX } from "react-icons/fi";
+// import { FiCheck, FiX } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuth";
 import {
   getInventoryRequests,
@@ -19,7 +19,7 @@ export default function WarehouseInventoryRequestsPage() {
 
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
-  const [selectedRequestId, setSelectedRequestId] = useState<number | null>(
+  const [selectedRequestId] = useState<number | null>(
     null,
   );
 
@@ -52,10 +52,10 @@ export default function WarehouseInventoryRequestsPage() {
     }
   };
 
-  const confirmReject = (id: number) => {
-    setSelectedRequestId(id);
-    setShowRejectModal(true);
-  };
+  // const confirmReject = (id: number) => {
+  //   setSelectedRequestId(id);
+  //   setShowRejectModal(true);
+  // };
 
   async function handleAction(
     requestId: number,

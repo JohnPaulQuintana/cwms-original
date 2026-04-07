@@ -89,10 +89,10 @@ export default function LoginPage() {
             <img
               src="/350x350.png"
               alt="Warehouse"
-              className="w-60 mx-auto rounded-md"
+              className="mx-auto rounded-md"
             />
-            <h2 className="text-4xl font-bold mb-3 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2>
-            <p className="opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
+            {/* <h2 className="-mt-10 text-4xl font-bold mb-3 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2> */}
+            <p className="-mt-14 opacity-90 text-2xl">Track stocks. Monitor movement. Optimize workflow.</p>
           </div>
         </div>
 
@@ -102,10 +102,10 @@ export default function LoginPage() {
             <img
               src="/350x350.png"
               alt="Warehouse"
-              className="w-40 mx-auto mb-4 rounded-md"
+              className="w-60 mx-auto mb-4 rounded-md"
             />
-            <h2 className="text-2xl font-bold mb-1 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2>
-            <p className="opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
+            {/* <h2 className="-mt-10 text-2xl font-bold mb-1 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2> */}
+            <p className="-mt-12 opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
           </div>
         </div>
 

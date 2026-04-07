@@ -77,10 +77,10 @@ export default function RegisterPage() {
             <img
               src="/350x350.png"
               alt="Warehouse"
-              className="w-60 mx-auto mb-6 drop-shadow-lg rounded-md"
+              className="mx-auto drop-shadow-lg rounded-md"
             />
-            <h2 className="text-4xl font-bold mb-3 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2>
-            <p className="opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
+            {/* <h2 className="text-4xl font-bold mb-3 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2> */}
+            <p className="-mt-14 text-2xl opacity-90">Track stocks. Monitor movement. Optimize workflow.</p>
           </div>
         </div>
 
@@ -90,10 +90,10 @@ export default function RegisterPage() {
             <img
               src="/350x350.png"
               alt="Warehouse"
-              className="w-40 mx-auto mb-4 drop-shadow-lg rounded-md"
+              className="w-60 mb-4 mx-auto drop-shadow-lg rounded-md"
             />
-            <h2 className="text-2xl font-bold mb-1 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2>
-            <p className="text-sm opacity-90">
+            {/* <h2 className="text-2xl font-bold mb-1 uppercase"><span className="text-3xl lowercase">i</span>bodegero</h2> */}
+            <p className="-mt-12 opacity-90">
               Track stocks. Monitor movement. Optimize workflow.
             </p>
           </div>

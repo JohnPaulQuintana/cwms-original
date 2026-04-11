@@ -23,8 +23,8 @@ export const navConfig = {
 
   project_manager: [
     { label: "Dashboard", icon: FiHome, path: "/dashboard/manager" },
-    { label: "Projects", icon: FiFolder, path: "/dashboard/manager/projects" },
-    { label: "Requests", icon: FiClipboard, path: "projects/request/inventory/status" },
+    { label: "Project", icon: FiFolder, path: "/dashboard/manager/projects" },
+    { label: "Request", icon: FiClipboard, path: "projects/request/inventory/status" },
     { label: "Shipment", icon: FiTruck, path: "/dashboard/manager/shipment" },
   ],
 

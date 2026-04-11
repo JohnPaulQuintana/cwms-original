@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-// import { FiCheck, FiX } from "react-icons/fi";
+import { FiCheck, FiX } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuth";
 import {
   getInventoryRequests,
@@ -19,7 +19,7 @@ export default function WarehouseInventoryRequestsPage() {
 
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
-  const [selectedRequestId] = useState<number | null>(
+  const [selectedRequestId, setSelectedRequestId] = useState<number | null>(
     null,
   );
 
@@ -52,10 +52,10 @@ export default function WarehouseInventoryRequestsPage() {
     }
   };
 
-  // const confirmReject = (id: number) => {
-  //   setSelectedRequestId(id);
-  //   setShowRejectModal(true);
-  // };
+  const confirmReject = (id: number) => {
+    setSelectedRequestId(id);
+    setShowRejectModal(true);
+  };
 
   async function handleAction(
     requestId: number,
@@ -175,7 +175,7 @@ export default function WarehouseInventoryRequestsPage() {
                   <td className="p-3 text-sm hidden lg:table-cell">
                     {new Date(req.created_at).toLocaleDateString()}
                   </td>
-                  <td className="p-3 text-center">
+                  {/* <td className="p-3 text-center">
                     <span
                       className={`text-white px-2 py-1 rounded-full text-xs font-medium ${
                         req.status === "approved"
@@ -191,8 +191,8 @@ export default function WarehouseInventoryRequestsPage() {
                           ? "Rejected by Admin"
                           : "Pending Approval"}
                     </span>
-                  </td>
-                  {/* <td className="p-3 text-center flex items-center justify-center gap-2">
+                  </td> */}
+                  <td className="p-3 text-center flex items-center justify-center gap-2">
                     
                     <div className="relative group">
                       <button
@@ -221,7 +221,7 @@ export default function WarehouseInventoryRequestsPage() {
                         onClick={() => confirmReject(req.id)}
                         disabled={req.status !== "pending"}
                         className={`p-1 rounded-full text-white transition ${
-                          req.status === "rejected"
+                          req.status !== "pending"
                             ? "bg-red-400 cursor-not-allowed"
                             : "bg-red-600 hover:bg-red-700"
                         }`}
@@ -236,7 +236,7 @@ export default function WarehouseInventoryRequestsPage() {
                         Reject
                       </span>
                     </div>
-                  </td> */}
+                  </td>
                 </tr>
               ))
             ) : (

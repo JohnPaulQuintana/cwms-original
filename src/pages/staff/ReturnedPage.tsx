@@ -5,6 +5,7 @@ import {
   getReturnedRequests,
   approveReturnedItem,
   mergeReturnedItem,
+  rejectReturnedItem
 } from "../../services/returnedService";
 import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../utils/toast";
@@ -77,6 +78,22 @@ export default function ReturnedPage() {
     }
   };
 
+   const handleRejected = async (item: any) => {
+    if (!token) return;
+
+    try {
+      await rejectReturnedItem(token, item.id);
+
+      showToast("Item rejected to inventory", "success");
+      await loadReturned(page);
+      setReturnItems((prev) =>
+        prev.map((r) => (r.id === item.id ? { ...r, status: "rejected" } : r)),
+      );
+    } catch (err: any) {
+      showToast(err.message || "Failed to merge", "error");
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-4">
       {/* Header */}
@@ -139,16 +156,16 @@ export default function ReturnedPage() {
                   <td className="p-3 text-sm">{item.warehouse_name}</td>
                   <td className="p-3 text-sm text-gray-700">
                     <span
-                        className={`${
-                          item.quantity === 0
-                            ? "text-red-700"
-                            : item.quantity <= 10
-                              ? "text-yellow-700"
-                              : "text-green-700"
-                        }`}
-                      >
-                        {item.quantity}
-                      </span>
+                      className={`${
+                        item.quantity === 0
+                          ? "text-red-700"
+                          : item.quantity <= 10
+                            ? "text-yellow-700"
+                            : "text-green-700"
+                      }`}
+                    >
+                      {item.quantity}
+                    </span>
                   </td>
                   <td className="p-3 text-sm">{item.unit}</td>
                   <td className="p-3 text-xs font-semibold uppercase">
@@ -158,7 +175,9 @@ export default function ReturnedPage() {
                           ? "text-yellow-600"
                           : item.status === "approved"
                             ? "text-green-600"
-                            : "text-green-700"
+                            : item.status === "rejected"
+                              ? "text-red-600"
+                              : "text-green-600"
                       }`}
                     >
                       {item.status}
@@ -179,12 +198,20 @@ export default function ReturnedPage() {
                       )}
 
                       {item.status === "approved" && (
-                        <button
-                          onClick={() => handleMerge(item)}
-                          className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-                        >
-                          Merge
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleMerge(item)}
+                            className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
+                          >
+                            Merge
+                          </button>
+                          <button
+                            onClick={() => handleRejected(item)}
+                            className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                          >
+                            Rejected
+                          </button>
+                        </div>
                       )}
                     </div>
                   </td>

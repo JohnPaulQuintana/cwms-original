@@ -38,13 +38,13 @@ export default function WarehousesPage() {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(
-    null
+    null,
   );
   const [processing, setProcessing] = useState(false);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [warehouseToDelete, setWarehouseToDelete] = useState<number | null>(
-    null
+    null,
   );
 
   // 🔁 Debounce search input
@@ -66,6 +66,7 @@ export default function WarehousesPage() {
       const res = await fetchWarehouses(token, page, debouncedSearch);
       const res_staff = await fetchStaff(token);
       setWarehouses(res.data.data);
+      console.log(res.data);
       setStaffs(res_staff.data.data || []);
       setTotalPages(res.data.last_page);
       setError("");
@@ -100,7 +101,7 @@ export default function WarehousesPage() {
   //handle records
   const handleRecords = (wh: Warehouse) => {
     // Implement the logic to view warehouse records tracking
-    console.log(wh)
+    console.log(wh);
     navigate(`/dashboard/admin/records`, { state: { wh } });
     // showToast(`Viewing records for warehouse: ${wh.name}`, "info");
   };
@@ -206,6 +207,7 @@ export default function WarehousesPage() {
           <thead className="bg-neutralLight text-left">
             <tr>
               <th className="p-3 text-sm font-medium">#</th>
+              <th className="p-3 text-sm font-medium">Assigned</th>
               <th className="p-3 text-sm font-medium">Name</th>
               <th className="p-3 text-sm font-medium">Description</th>
               <th className="p-3 text-sm font-medium hidden sm:table-cell">
@@ -222,6 +224,15 @@ export default function WarehousesPage() {
               warehouses.map((wh, i) => (
                 <tr key={wh.id} className="border-t hover:bg-neutralLight">
                   <td className="p-3 text-sm">{(page - 1) * 10 + i + 1}</td>
+                  <td className="p-3 text-sm font-medium">
+                    {wh.staff_name ? (
+                      <span className="text-primary font-bold">{wh.staff_name}</span>
+                    ) : (
+                      <span className="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded-full">
+                        Unassigned
+                      </span>
+                    )}
+                  </td>
                   <td className="p-3 text-sm font-medium">{wh.name}</td>
                   <td className="p-3 text-sm">{wh.description}</td>
                   <td className="p-3 text-sm hidden sm:table-cell">
@@ -232,7 +243,6 @@ export default function WarehousesPage() {
                   </td>
                   <td className="p-3 text-sm">
                     <div className="flex justify-center gap-2">
-
                       <button
                         title="Warehouse Records"
                         onClick={() => handleRecords(wh)}

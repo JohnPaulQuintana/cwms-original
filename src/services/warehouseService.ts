@@ -9,6 +9,7 @@ export interface Warehouse {
   description: string;
   address: string;
   staff_id: number;
+  staff_name: string;
   created_at: string;
   updated_at: string;
 }

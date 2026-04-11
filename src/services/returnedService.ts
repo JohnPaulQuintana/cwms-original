@@ -58,3 +58,19 @@ export async function mergeReturnedItem(
   if (!data.success) throw new Error("Failed to merge returned item");
   return data;
 }
+
+export async function rejectReturnedItem(
+  token: string,
+  id: number
+): Promise<ReturnedRequestsResponse> {
+  const { data } = await axios.post<ReturnedRequestsResponse>(
+    `${API_URL}/users/returned-items/${id}/rejected`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+
+  if (!data.success) throw new Error("Failed to merge returned item");
+  return data;
+}

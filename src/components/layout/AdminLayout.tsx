@@ -7,6 +7,7 @@ import { useUpdatePassword } from "../../hooks/useUpdatePassword";
 import { navConfig } from "../../config/navConfig";
 import { Outlet } from "react-router-dom";
 import { PasswordField } from "../common/PasswordField";
+import { useNavCount } from "../../hooks/useNavCount";
 
 export default function AdminLayout() {
   const { user, logoutUser, adminApproval, updateProfileInfo } = useAuth(); // add updateUser
@@ -18,6 +19,8 @@ export default function AdminLayout() {
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false); // new
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+
+  const { counts, loading } = useNavCount();
 
   console.log(dropdownOpen);
   console.log(notifOpen);
@@ -95,6 +98,51 @@ export default function AdminLayout() {
   const role = user?.role || "admin";
   const links = navConfig[role] || [];
 
+  const getBadgeCount = (label: string) => {
+    switch (label.toLowerCase()) {
+      case "inventory":
+        return counts.inventory || 0;
+
+      case "shipment":
+        return counts.shipment || 0;
+      case "request":
+        return counts.request || 0;
+      case "defected":
+        return counts.defected || 0;
+      case "returned":
+        return counts.returned || 0;
+      case "warehouses":
+        return counts.warehouses || 0;
+      case "projects":
+        return counts.projects || 0;
+
+      default:
+        return 0;
+    }
+  };
+
+  const getTooltipText = (label: string) => {
+    switch (label.toLowerCase()) {
+      case "inventory":
+        return "Low Stocks";
+
+      case "shipment":
+        return "Pending Shipment";
+
+      case "request":
+        return "Pending Request";
+
+      case "defected":
+        return "Defected Today";
+
+      case "returned":
+        return "Total Returned Item Today";
+
+      default:
+        return label;
+    }
+  };
+
   return (
     <div className="flex h-screen bg-neutralLight">
       {/* Sidebar (Desktop) */}
@@ -126,10 +174,23 @@ export default function AdminLayout() {
               <Link
                 key={label}
                 to={path}
-                className={`flex items-center space-x-2 p-2 rounded transition ${location.pathname === path ? "bg-primaryLight text-white font-semibold" : ""} hover:bg-primaryLight`}
+                className={`flex items-center justify-between p-2 rounded transition ${location.pathname === path ? "bg-primaryLight text-white font-semibold" : ""} hover:bg-primaryLight`}
               >
-                <Icon />
-                <span>{label}</span>
+                <div className="flex items-center space-x-2">
+                  <Icon />
+                  <span>{label}</span>
+                </div>
+                {getBadgeCount(label) > 0 && (
+                  <div className="relative group">
+                    <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                      {getBadgeCount(label)}
+                    </span>
+
+                    <div className="absolute right-0 mt-1 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                      {getTooltipText(label)}: {getBadgeCount(label)}
+                    </div>
+                  </div>
+                )}
               </Link>
             );
           })}
@@ -203,10 +264,24 @@ export default function AdminLayout() {
               <Link
                 key={label}
                 to={path}
-                className={`flex items-center space-x-2 p-2 rounded transition ${location.pathname === path ? "bg-primaryLight text-white font-semibold" : ""} hover:bg-primaryLight`}
+                className={`flex items-center justify-between p-2 rounded transition ${location.pathname === path ? "bg-primaryLight text-white font-semibold" : ""} hover:bg-primaryLight`}
               >
-                <Icon />
-                <span>{label}</span>
+                <div className="flex items-center space-x-2">
+                  <Icon />
+                  <span>{label}</span>
+                </div>
+
+                {getBadgeCount(label) > 0 && (
+                  <div className="relative group">
+                    <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                      {getBadgeCount(label)}
+                    </span>
+
+                    <div className="absolute right-0 mt-1 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                      {getTooltipText(label)}: {getBadgeCount(label)}
+                    </div>
+                  </div>
+                )}
               </Link>
             );
           })}

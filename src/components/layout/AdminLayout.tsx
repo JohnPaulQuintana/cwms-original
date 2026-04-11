@@ -20,7 +20,7 @@ export default function AdminLayout() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
-  const { counts, loading } = useNavCount();
+  const { counts } = useNavCount();
 
   console.log(dropdownOpen);
   console.log(notifOpen);

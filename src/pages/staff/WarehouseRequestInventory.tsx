@@ -112,7 +112,7 @@ export default function WarehouseInventoryRequestsPage() {
             </p>
           ) : (
             <div className="space-y-3 p-3">
-              {filteredRequests.map((req, index) => (
+              {filteredRequests.map((req) => (
                 <div
                   key={req.id}
                   className="border rounded-xl p-4 shadow-sm bg-white"

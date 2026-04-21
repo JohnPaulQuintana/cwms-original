@@ -193,155 +193,240 @@ export default function ProjectInventoryRequestsPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="overflow-x-auto border rounded-lg"
-      >
-        <table className="w-full border-collapse">
-          <thead className="bg-neutralLight text-left">
-            <tr>
-              <th className="p-3 text-sm font-medium">#</th>
-              <th
-                className="p-3 text-sm font-medium cursor-pointer"
-                onClick={() => handleSort("inventory_name")}
-              >
-                Item
-              </th>
-              <th className="p-3 text-sm font-medium hidden sm:table-cell">
-                Project
-              </th>
-              <th className="p-3 text-sm font-medium hidden md:table-cell">
-                Warehouse
-              </th>
-              <th className="p-3 text-sm font-medium hidden lg:table-cell">
-                Quantity
-              </th>
-              <th className="p-3 text-sm font-medium hidden lg:table-cell">
-                Unit
-              </th>
-              <th className="p-3 text-sm font-medium hidden md:table-cell">
-                Status
-              </th>
-              <th
-                className="p-3 text-sm font-medium hidden lg:table-cell cursor-pointer"
-                onClick={() => handleSort("created_at")}
-              >
-                Requested At
-              </th>
-              <th className="p-3 text-sm font-medium text-center">Actions</th>
-            </tr>
-          </thead>
+      {/* ================= WRAPPER ================= */}
+<motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="border rounded-lg"
+>
+  {/* ================= MOBILE CARD VIEW ================= */}
+  <div className="md:hidden space-y-4 p-3">
+    {requests
+      .filter((r) => !selectedStatus || r.status === selectedStatus)
+      .length > 0 ? (
+      requests
+        .filter((r) => !selectedStatus || r.status === selectedStatus)
+        .map((req, i) => (
+          <div
+            key={req.id}
+            className="border rounded-xl p-4 shadow-sm bg-white"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs text-gray-500">
+                  #{(page - 1) * 10 + i + 1}
+                </p>
+                <h2 className="font-semibold text-lg">
+                  {req.inventory_name}
+                </h2>
+              </div>
 
-          <tbody>
-            {requests
-              .filter((r) => !selectedStatus || r.status === selectedStatus)
-              .map((req, i) => (
-                <tr
-                  key={req.id}
-                  className="border-t hover:bg-neutralLight transition-colors"
-                >
-                  <td className="p-3 text-sm">{(page - 1) * 10 + i + 1}</td>
-                  <td className="p-3 text-sm font-medium">
-                    {req.inventory_name}
-                  </td>
-                  <td className="p-3 text-sm hidden sm:table-cell">
-                    {req.project_name}
-                  </td>
-                  <td className="p-3 text-sm hidden md:table-cell">
-                    {req.warehouse_name}
-                  </td>
-                  <td className="p-3 text-sm hidden lg:table-cell">
-                    {req.requested_qty}
-                  </td>
-                  <td className="p-3 text-sm hidden lg:table-cell">
-                    {req.unit}
-                  </td>
-                  <td
-                    className={`p-3 text-sm hidden md:table-cell font-semibold ${
-                      req.status === "approved"
-                        ? "text-green-600"
-                        : req.status === "pending"
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                    }`}
+              {/* Status */}
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-semibold text-white ${
+                  req.status === "approved"
+                    ? "bg-green-600"
+                    : req.status === "pending"
+                    ? "bg-yellow-600"
+                    : "bg-red-600"
+                }`}
+              >
+                {req.status}
+              </span>
+            </div>
+
+            {/* Details */}
+            <div className="mt-3 text-sm space-y-1">
+              <p>
+                <span className="font-medium">Project:</span>{" "}
+                {req.project_name || "—"}
+              </p>
+
+              <p>
+                <span className="font-medium">Warehouse:</span>{" "}
+                {req.warehouse_name || "—"}
+              </p>
+
+              <p>
+                <span className="font-medium">Quantity:</span>{" "}
+                {req.requested_qty} {req.unit}
+              </p>
+
+              <p>
+                <span className="font-medium">Requested:</span>{" "}
+                {new Date(req.created_at).toLocaleString()}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2 mt-4">
+              {req.status === "pending" ? (
+                <>
+                  <button
+                    onClick={() => handleAction(req.id, "approved")}
+                    className="flex-1 bg-green-600 text-white rounded-lg py-1"
                   >
-                    <span className={`text-white ${
-                        req.status === "approved"
-                          ? "bg-green-600 p-1 px-2 rounded-xl text-xs"
-                          : req.status === "pending"
-                            ? "bg-yellow-600 p-1 px-2 rounded-xl text-xs"
-                            : ""
-                      }`}>
-                    {req.status}
+                    Approve
+                  </button>
 
-                    </span>
-                  </td>
-                  <td className="p-3 text-sm hidden lg:table-cell">
-                    {new Date(req.created_at).toLocaleString()}
-                  </td>
-
-                  <td className="p-3 text-sm">
-                    <div className="flex justify-center gap-2">
-                      {req.status === "pending" ? (
-                        <>
-                          <div className="relative group">
-                            <button
-                              onClick={() => handleAction(req.id, "approved")}
-                              className="p-1 rounded-full text-white transition bg-green-600 hover:bg-green-700"
-                            >
-                              <FiCheck size={12} />
-                            </button>
-                          </div>
-
-                          <div className="relative group">
-                            <button
-                              onClick={() => confirmReject(req.id)}
-                              className="p-1 rounded-full text-white transition bg-red-600 hover:bg-red-700"
-                            >
-                              <FiX size={12} />
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        // ✅ Details Button if Approved or Rejected
-                        <div className="relative group">
-                          <button
-                            onClick={() => handleDetails(req)} // open modal or navigate to details page
-                            className="text-gray-700 hover:text-gray-900 transition-colors border p-1 rounded-md border-gray-600"
-                          >
-                            <FiInfo size={16} />
-                          </button>
-                          <span
-                            className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
-            bg-gray-800 text-white text-xs rounded py-1 px-2 
-            opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                          >
-                            Details
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-
-            {requests.filter(
-              (r) => !selectedStatus || r.status === selectedStatus,
-            ).length === 0 && (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="p-4 text-center text-gray-500 text-sm"
+                  <button
+                    onClick={() => confirmReject(req.id)}
+                    className="flex-1 bg-red-600 text-white rounded-lg py-1"
+                  >
+                    Reject
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => handleDetails(req)}
+                  className="flex-1 border border-gray-600 rounded-lg py-1 text-gray-700"
                 >
-                  No requests found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </motion.div>
+                  Details
+                </button>
+              )}
+            </div>
+          </div>
+        ))
+    ) : (
+      <p className="text-center text-gray-500 text-sm py-4">
+        No requests found.
+      </p>
+    )}
+  </div>
+
+  {/* ================= DESKTOP TABLE ================= */}
+  <div className="hidden md:block overflow-x-auto">
+    <table className="w-full border-collapse">
+      <thead className="bg-neutralLight text-left">
+        <tr>
+          <th className="p-3 text-sm font-medium">#</th>
+
+          <th
+            className="p-3 text-sm font-medium cursor-pointer"
+            onClick={() => handleSort("inventory_name")}
+          >
+            Item
+          </th>
+
+          <th className="p-3 text-sm font-medium">Project</th>
+          <th className="p-3 text-sm font-medium">Warehouse</th>
+          <th className="p-3 text-sm font-medium">Quantity</th>
+          <th className="p-3 text-sm font-medium">Unit</th>
+          <th className="p-3 text-sm font-medium">Status</th>
+
+          <th
+            className="p-3 text-sm font-medium cursor-pointer"
+            onClick={() => handleSort("created_at")}
+          >
+            Requested At
+          </th>
+
+          <th className="p-3 text-sm font-medium text-center">
+            Actions
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {requests
+          .filter((r) => !selectedStatus || r.status === selectedStatus)
+          .map((req, i) => (
+            <tr
+              key={req.id}
+              className="border-t hover:bg-neutralLight"
+            >
+              <td className="p-3 text-sm">
+                {(page - 1) * 10 + i + 1}
+              </td>
+
+              <td className="p-3 text-sm font-medium">
+                {req.inventory_name}
+              </td>
+
+              <td className="p-3 text-sm">
+                {req.project_name}
+              </td>
+
+              <td className="p-3 text-sm">
+                {req.warehouse_name}
+              </td>
+
+              <td className="p-3 text-sm">
+                {req.requested_qty}
+              </td>
+
+              <td className="p-3 text-sm">
+                {req.unit}
+              </td>
+
+              <td className="p-3 text-sm font-semibold">
+                <span
+                  className={`text-white px-2 py-1 rounded-xl text-xs ${
+                    req.status === "approved"
+                      ? "bg-green-600"
+                      : req.status === "pending"
+                      ? "bg-yellow-600"
+                      : "bg-red-600"
+                  }`}
+                >
+                  {req.status}
+                </span>
+              </td>
+
+              <td className="p-3 text-sm">
+                {new Date(req.created_at).toLocaleString()}
+              </td>
+
+              <td className="p-3 text-sm">
+                <div className="flex justify-center gap-2">
+                  {req.status === "pending" ? (
+                    <>
+                      <button
+                        onClick={() =>
+                          handleAction(req.id, "approved")
+                        }
+                        className="p-1 rounded-full text-white bg-green-600"
+                      >
+                        <FiCheck size={12} />
+                      </button>
+
+                      <button
+                        onClick={() => confirmReject(req.id)}
+                        className="p-1 rounded-full text-white bg-red-600"
+                      >
+                        <FiX size={12} />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleDetails(req)}
+                      className="border p-1 rounded-md border-gray-600"
+                    >
+                      <FiInfo size={16} />
+                    </button>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+
+        {requests.filter(
+          (r) => !selectedStatus || r.status === selectedStatus
+        ).length === 0 && (
+          <tr>
+            <td
+              colSpan={9}
+              className="p-4 text-center text-gray-500 text-sm"
+            >
+              No requests found.
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</motion.div>
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">

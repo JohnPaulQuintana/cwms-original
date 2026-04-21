@@ -82,7 +82,7 @@ export default function UsersPage() {
   // Toast helper
   const showToast = (
     message: string,
-    type: "success" | "error" = "success"
+    type: "success" | "error" = "success",
   ) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
@@ -194,84 +194,145 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto border rounded-lg">
-        <table className="w-full border-collapse">
-          <thead className="bg-neutralLight text-left">
-            <tr>
-              <th className="p-3 text-sm font-medium">#</th>
-              <th className="p-3 text-sm font-medium">Name</th>
-              <th className="p-3 text-sm font-medium hidden sm:table-cell">
-                Email
-              </th>
-              <th className="p-3 text-sm font-medium hidden md:table-cell">
-                Role
-              </th>
-              <th className="p-3 text-sm font-medium">Status</th>
-              <th className="p-3 text-sm font-medium hidden lg:table-cell">
-                Created At
-              </th>
-              <th className="p-3 text-sm font-medium text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.length > 0 ? (
-              users.map((user, i) => (
+      {/* ================= WRAPPER ================= */}
+      <div className="border rounded-lg">
+        {/* ================= MOBILE CARD VIEW ================= */}
+        <div className="md:hidden space-y-4 p-3">
+          {users.length > 0 ? (
+            users.map((user, i) => (
+              <div
+                key={user.id}
+                className="border rounded-xl p-4 shadow-sm bg-white"
+              >
+                {/* Header */}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-xs text-gray-500">
+                      #{(page - 1) * 10 + i + 1}
+                    </p>
+                    <h2 className="font-semibold text-lg">{user.name}</h2>
+                  </div>
+
+                  {/* Status */}
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium text-white ${
+                      user.is_active
+                        ? "bg-green-600"
+                        : "bg-red-600"
+                    }`}
+                  >
+                    {user.is_active ? "Active" : "Inactive"}
+                  </span>
+                </div>
+
+                {/* Details */}
+                <div className="mt-3 text-sm space-y-1">
+                  <p>
+                    <span className="font-medium">Email:</span> {user.email}
+                  </p>
+
+                  <p>
+                    <span className="font-medium">Role:</span>{" "}
+                    {user.role.replace("_", " ")}
+                  </p>
+
+                  <p>
+                    <span className="font-medium">Created:</span>{" "}
+                    {new Date(user.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={() => handleEdit(user)}
+                    className="flex-1 text-blue-600 border border-blue-600 rounded-lg py-1"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(user.id)}
+                    className="flex-1 text-red-600 border border-red-600 rounded-lg py-1"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 text-sm py-4">
+              No users found.
+            </p>
+          )}
+        </div>
+
+        {/* ================= DESKTOP TABLE ================= */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-neutralLight text-left">
+              <tr>
+                <th className="p-3 text-sm font-medium">#</th>
+                <th className="p-3 text-sm font-medium">Name</th>
+                <th className="p-3 text-sm font-medium">Email</th>
+                <th className="p-3 text-sm font-medium">Role</th>
+                <th className="p-3 text-sm font-medium">Status</th>
+                <th className="p-3 text-sm font-medium">Created At</th>
+                <th className="p-3 text-sm font-medium text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {users.map((user, i) => (
                 <tr key={user.id} className="border-t hover:bg-neutralLight">
                   <td className="p-3 text-sm">{(page - 1) * 10 + i + 1}</td>
+
                   <td className="p-3 text-sm font-medium">{user.name}</td>
-                  <td className="p-3 text-sm hidden sm:table-cell">
-                    {user.email}
-                  </td>
-                  <td className="p-3 text-sm capitalize hidden md:table-cell">
+
+                  <td className="p-3 text-sm">{user.email}</td>
+
+                  <td className="p-3 text-sm capitalize">
                     {user.role.replace("_", " ")}
                   </td>
+
                   <td className="p-3 text-sm">
                     <span
                       className={
                         user.is_active
-                          ? "text-white bg-green-600 p-1 px-2 rounded-xl font-semibold"
-                          : "text-white bg-red-600 p-1 px-2 rounded-xl font-semibold"
+                          ? "text-white bg-green-600 px-2 py-1 rounded-xl font-semibold"
+                          : "text-white bg-red-600 px-2 py-1 rounded-xl font-semibold"
                       }
                     >
                       {user.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="p-3 text-sm hidden lg:table-cell">
+
+                  <td className="p-3 text-sm">
                     {new Date(user.created_at).toLocaleDateString()}
                   </td>
+
                   <td className="p-3 text-sm">
                     <div className="flex justify-center gap-2">
                       <button
                         onClick={() => handleEdit(user)}
-                        className="text-blue-500 hover:text-blue-700 transition-colors"
+                        className="text-blue-500 hover:text-blue-700"
                       >
-                        {" "}
-                        <FiEdit size={16} />{" "}
+                        <FiEdit size={16} />
                       </button>
+
                       <button
                         onClick={() => handleDelete(user.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
+                        className="text-red-500 hover:text-red-700"
                       >
-                        {" "}
-                        <FiTrash2 size={16} />{" "}
+                        <FiTrash2 size={16} />
                       </button>
                     </div>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="text-center text-gray-500 py-4 text-sm"
-                >
-                  No users found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Pagination */}

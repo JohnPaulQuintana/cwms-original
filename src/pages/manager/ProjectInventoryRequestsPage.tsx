@@ -226,184 +226,292 @@ export default function ProjectInventoryRequestsPage() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-x-auto border rounded-lg"
+        className="border rounded-lg"
       >
-        <table className="w-full border-collapse">
-          <thead className="bg-neutralLight text-left">
-            <tr>
-              <th className="p-3 text-sm font-medium">#</th>
-              <th
-                className="p-3 text-sm font-medium cursor-pointer"
-                onClick={() => handleSort("inventory_name")}
-              >
-                Item
-              </th>
-              <th className="p-3 text-sm font-medium hidden sm:table-cell">
-                Project
-              </th>
-              <th className="p-3 text-sm font-medium hidden md:table-cell">
-                Warehouse
-              </th>
-              <th className="p-3 text-sm font-medium hidden lg:table-cell">
-                Quantity
-              </th>
-              <th className="p-3 text-sm font-medium hidden lg:table-cell">
-                Unit
-              </th>
-              <th className="p-3 text-sm font-medium hidden md:table-cell">
-                Status
-              </th>
-              <th
-                className="p-3 text-sm font-medium hidden lg:table-cell cursor-pointer"
-                onClick={() => handleSort("created_at")}
-              >
-                Requested At
-              </th>
-              <th className="p-3 text-sm font-medium text-center">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {requests
-              .filter((r) => !selectedStatus || r.status === selectedStatus)
-              .map((req, i) => (
-                <tr
-                  key={req.id}
-                  className="border-t hover:bg-neutralLight transition-colors"
-                >
-                  <td className="p-3 text-sm">{(page - 1) * 10 + i + 1}</td>
-                  <td className="p-3 text-sm font-medium">
-                    {req.inventory_name}
-                  </td>
-                  <td className="p-3 text-sm hidden sm:table-cell">
-                    {req.project_name}
-                  </td>
-                  <td className="p-3 text-sm hidden md:table-cell">
-                    {req.warehouse_name}
-                  </td>
-                  <td className="p-3 text-sm hidden lg:table-cell">
-                    {req.requested_qty}
-                  </td>
-                  <td className="p-3 text-sm hidden lg:table-cell">
-                    {req.unit}
-                  </td>
-                  <td
-                    className={`p-3 text-sm hidden md:table-cell font-semibold ${
-                      req.status === "approved"
-                        ? "text-green-600"
-                        : req.status === "pending"
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                    }`}
+        {/* ================= MOBILE VIEW ================= */}
+        <div className="md:hidden">
+          {requests.filter(
+            (r) => !selectedStatus || r.status === selectedStatus,
+          ).length === 0 ? (
+            <p className="p-4 text-center text-gray-500">No requests found.</p>
+          ) : (
+            <div className="space-y-3 p-3">
+              {requests
+                .filter((r) => !selectedStatus || r.status === selectedStatus)
+                .map((req, i) => (
+                  <div
+                    key={req.id}
+                    className="border rounded-xl p-4 bg-white shadow-sm"
                   >
-                    {req.status}
-                  </td>
-                  <td className="p-3 text-sm hidden lg:table-cell">
-                    {new Date(req.created_at).toLocaleString()}
-                  </td>
+                    {/* Header */}
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-xs text-gray-500">
+                          #{i + 1 + (page - 1) * 10}
+                        </p>
+                        <p className="font-semibold text-sm">
+                          {req.inventory_name}
+                        </p>
+                      </div>
 
-                  <td className="p-3 text-sm">
-                    <div className="flex justify-center gap-2">
+                      {/* <span
+                        className={`px-2 py-1 rounded-full text-white text-xs ${
+                          s.status === "pending"
+                            ? "bg-yellow-500"
+                            : s.status === "in_transit"
+                              ? "bg-blue-500"
+                              : s.status === "shipped"
+                                ? "bg-indigo-500"
+                                : s.status === "delivered"
+                                  ? "bg-green-500"
+                                  : "bg-gray-500"
+                        }`}
+                      >
+                        {s.status.replace("_", " ")}
+                      </span> */}
+                      <span
+                        className={`px-2 py-1 rounded-full text-white text-xs ${
+                          req.status === "approved"
+                            ? "bg-green-600"
+                            : req.status === "pending"
+                              ? "bg-yellow-600"
+                              : "bg-red-600"
+                        }`}
+                      >
+                        {req.status}
+                      </span>
+                    </div>
+
+                    {/* Details */}
+                    <div className="mt-3 text-sm space-y-1">
+                      <p>
+                        <span className="font-medium">Project:</span>{" "}
+                        {req.project_name}
+                      </p>
+
+                      <p>
+                        <span className="font-medium">Warehouse:</span>{" "}
+                        {req.warehouse_name}
+                      </p>
+
+                      <p>
+                        <span className="font-medium">Qty:</span>{" "}
+                        {req.requested_qty} {req.unit}
+                      </p>
+
+                      <p>
+                        <span className="font-medium">Date:</span>{" "}
+                        {new Date(req.created_at).toLocaleString()}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2 mt-4">
                       {req.status === "pending" ? (
                         <>
-                          {/* Edit */}
-                          <div className="relative group">
+                          <button
+                            onClick={() =>
+                              handleEdit(req.id, req.requested_qty)
+                            }
+                            className="flex-1 border border-blue-600 text-blue-600 rounded-lg py-1"
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            onClick={() => handleDelete(req.id)}
+                            className="flex-1 border border-red-600 text-red-600 rounded-lg py-1"
+                          >
+                            Delete
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleDetails(req)}
+                            className="flex-1 border border-gray-600 text-gray-700 rounded-lg py-1"
+                          >
+                            Details
+                          </button>
+
+                          {req.status === "approved" && (
+                            <button
+                              onClick={async () => {
+                                handleReturnClick(req);
+                                await loadRequests();
+                              }}
+                              className="flex-1 border border-yellow-500 text-yellow-600 rounded-lg py-1"
+                            >
+                              Return
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+
+        {/* ================= DESKTOP TABLE ================= */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-neutralLight text-left">
+              <tr>
+                <th className="p-3 text-sm font-medium">#</th>
+
+                <th
+                  className="p-3 text-sm font-medium cursor-pointer"
+                  onClick={() => handleSort("inventory_name")}
+                >
+                  Item
+                </th>
+
+                <th className="p-3 text-sm font-medium hidden sm:table-cell">
+                  Project
+                </th>
+
+                <th className="p-3 text-sm font-medium hidden md:table-cell">
+                  Warehouse
+                </th>
+
+                <th className="p-3 text-sm font-medium hidden lg:table-cell">
+                  Quantity
+                </th>
+
+                <th className="p-3 text-sm font-medium hidden lg:table-cell">
+                  Unit
+                </th>
+
+                <th className="p-3 text-sm font-medium hidden md:table-cell">
+                  Status
+                </th>
+
+                <th
+                  className="p-3 text-sm font-medium hidden lg:table-cell cursor-pointer"
+                  onClick={() => handleSort("created_at")}
+                >
+                  Requested At
+                </th>
+
+                <th className="p-3 text-sm font-medium text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {requests
+                .filter((r) => !selectedStatus || r.status === selectedStatus)
+                .map((req, i) => (
+                  <tr
+                    key={req.id}
+                    className="border-t hover:bg-neutralLight transition-colors"
+                  >
+                    <td className="p-3 text-sm">{i + 1 + (page - 1) * 10}</td>
+
+                    <td className="p-3 text-sm font-medium">
+                      {req.inventory_name}
+                    </td>
+
+                    <td className="p-3 text-sm hidden sm:table-cell">
+                      {req.project_name}
+                    </td>
+
+                    <td className="p-3 text-sm hidden md:table-cell">
+                      {req.warehouse_name}
+                    </td>
+
+                    <td className="p-3 text-sm hidden lg:table-cell">
+                      {req.requested_qty}
+                    </td>
+
+                    <td className="p-3 text-sm hidden lg:table-cell">
+                      {req.unit}
+                    </td>
+
+                    <td className="p-3 text-sm hidden md:table-cell font-semibold">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${
+                          req.status === "approved"
+                            ? "bg-green-100 text-green-700"
+                            : req.status === "pending"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : req.status === "rejected"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {req.status}
+                      </span>
+                    </td>
+
+                    <td className="p-3 text-sm hidden lg:table-cell">
+                      {new Date(req.created_at).toLocaleString()}
+                    </td>
+
+                    <td className="p-3 text-sm">
+                      <div className="flex justify-center gap-2">
+                        {/* Pending Actions */}
+                        {req.status === "pending" ? (
+                          <>
                             <button
                               onClick={() =>
                                 handleEdit(req.id, req.requested_qty)
                               }
-                              className="text-blue-500 hover:text-blue-700 transition-colors border p-1 rounded-md border-blue-700"
+                              className="text-blue-600 border p-1 rounded-md border-blue-600"
                             >
                               <FiEdit size={16} />
                             </button>
-                            <span
-                              className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
-        bg-gray-800 text-white text-xs rounded py-1 px-2 
-        opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                            >
-                              Edit
-                            </span>
-                          </div>
 
-                          {/* Delete */}
-                          <div className="relative group">
                             <button
                               onClick={() => handleDelete(req.id)}
-                              className="text-red-500 hover:text-red-700 transition-colors border p-1 rounded-md border-red-500"
+                              className="text-red-600 border p-1 rounded-md border-red-600"
                             >
                               <FiTrash2 size={16} />
                             </button>
-                            <span
-                              className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
-        bg-gray-800 text-white text-xs rounded py-1 px-2 
-        opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                            >
-                              Delete
-                            </span>
-                          </div>
-                        </>
-                      ) : (
-                        // Approved or Rejected
-                        <div className="flex gap-2 justify-center">
-                          {/* Details Button */}
-                          <div className="relative group">
+                          </>
+                        ) : (
+                          <>
                             <button
                               onClick={() => handleDetails(req)}
-                              className="text-gray-700 hover:text-gray-900 transition-colors border p-1 rounded-md border-gray-600"
+                              className="text-gray-700 border p-1 rounded-md border-gray-600"
                             >
                               <FiInfo size={16} />
                             </button>
-                            <span
-                              className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
-        bg-gray-800 text-white text-xs rounded py-1 px-2 
-        opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                            >
-                              Details
-                            </span>
-                          </div>
 
-                          {/* Return button only for approved requests */}
-                          {req.status === "approved" && (
-                            <div className="relative group">
+                            {req.status === "approved" && (
                               <button
                                 onClick={async () => {
                                   handleReturnClick(req);
                                   await loadRequests();
                                 }}
-                                className="text-yellow-500 hover:text-yellow-700 transition-colors border p-1 rounded-md border-yellow-500"
+                                className="text-yellow-600 border p-1 rounded-md border-yellow-500"
                               >
                                 Return
                               </button>
-                              <span
-                                className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
-      bg-gray-800 text-white text-xs rounded py-1 px-2 
-      opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                              >
-                                Return
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+              {requests.filter(
+                (r) => !selectedStatus || r.status === selectedStatus,
+              ).length === 0 && (
+                <tr>
+                  <td
+                    colSpan={9}
+                    className="p-4 text-center text-gray-500 text-sm"
+                  >
+                    No requests found.
                   </td>
                 </tr>
-              ))}
-
-            {requests.filter(
-              (r) => !selectedStatus || r.status === selectedStatus,
-            ).length === 0 && (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="p-4 text-center text-gray-500 text-sm"
-                >
-                  No requests found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </motion.div>
 
       {/* Pagination */}

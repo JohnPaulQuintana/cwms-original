@@ -207,68 +207,179 @@ export default function ProjectRequestInventoryPage() {
       </div>
 
       {/* Inventory Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="overflow-x-auto border rounded-lg"
-      >
-        <table className="w-full border-collapse text-sm">
-          <thead className="bg-neutralLight text-left">
-            <tr>
-              <th className="p-3 font-medium">#</th>
-              <th className="p-3 font-medium">Name</th>
-              <th className="p-3 font-medium hidden sm:table-cell">SKU</th>
-              <th className="p-3 font-medium hidden md:table-cell">Quantity</th>
-              <th className="p-3 font-medium hidden lg:table-cell">Unit</th>
-              <th className="p-3 font-medium hidden xl:table-cell">Location</th>
-              <th className="p-3 font-medium hidden 2xl:table-cell">Created</th>
-              <th className="p-3 font-medium text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inventory.length > 0 ? (
-              inventory.map((item, i) => {
-                const inRequest = requestList.find((r) => r.id === item.id);
-                return (
-                  <tr key={item.id} className="border-t hover:bg-neutralLight">
-                    <td className="p-3">{(page - 1) * 10 + i + 1}</td>
-                    <td className="p-3 font-medium">{item.name}</td>
-                    <td className="p-3 hidden sm:table-cell">{item.sku}</td>
-                    <td className="p-3 hidden md:table-cell">
-                      {item.quantity}
-                    </td>
-                    <td className="p-3 hidden lg:table-cell">{item.unit}</td>
-                    <td className="p-3 hidden xl:table-cell">
-                      {item.location?.name || "—"}
-                    </td>
-                    <td className="p-3 hidden 2xl:table-cell">
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="p-3 text-center">
-                      <button
-                        onClick={() => handleOpenModal(item)}
-                        className={`px-3 py-1 rounded ${
-                          inRequest
-                            ? "bg-yellow-400 hover:bg-yellow-500"
-                            : "bg-blue-500 hover:bg-blue-700"
-                        } text-white`}
-                      >
-                        {inRequest ? "Edit" : "Add"}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan={8} className="p-4 text-center text-gray-500">
-                  No inventory items found.
+<motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="border rounded-lg"
+>
+  {/* ================= MOBILE VIEW ================= */}
+  <div className="md:hidden">
+    {inventory.length > 0 ? (
+      <div className="space-y-3 p-3">
+        {inventory.map((item, i) => {
+          const inRequest = requestList.find((r) => r.id === item.id);
+
+          return (
+            <div
+              key={item.id}
+              className="border rounded-xl p-4 bg-white shadow-sm"
+            >
+              {/* Header */}
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs text-gray-500">
+                    #{i + 1 + (page - 1) * 10}
+                  </p>
+                  <p className="font-semibold text-sm">{item.name}</p>
+                </div>
+
+                <span className="px-2 py-1 rounded-full text-white text-xs bg-blue-900">
+                  {item.unit}
+                </span>
+              </div>
+
+              {/* Details */}
+              <div className="mt-3 text-sm space-y-1">
+                <p>
+                  <span className="font-medium">SKU:</span>{" "}
+                  {item.sku}
+                </p>
+
+                <p>
+                  <span className="font-medium">Quantity:</span>{" "}
+                  {item.quantity}
+                </p>
+
+                <p>
+                  <span className="font-medium">Location:</span>{" "}
+                  {item.location?.name || "—"}
+                </p>
+
+                <p>
+                  <span className="font-medium">Created:</span>{" "}
+                  {new Date(item.created_at).toLocaleDateString()}
+                </p>
+              </div>
+
+              {/* Action */}
+              <div className="mt-4">
+                <button
+                  onClick={() => handleOpenModal(item)}
+                  className={`w-full px-3 py-2 rounded-lg text-white transition ${
+                    inRequest
+                      ? "bg-yellow-500 hover:bg-yellow-600"
+                      : "bg-blue-900 hover:bg-blue-950"
+                  }`}
+                >
+                  {inRequest ? "Edit" : "Add"}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ) : (
+      <p className="p-4 text-center text-gray-500">
+        No inventory items found.
+      </p>
+    )}
+  </div>
+
+  {/* ================= DESKTOP TABLE ================= */}
+  <div className="hidden md:block overflow-x-auto">
+    <table className="w-full border-collapse text-sm">
+      <thead className="bg-neutralLight text-left">
+        <tr>
+          <th className="p-3 font-medium">#</th>
+          <th className="p-3 font-medium">Name</th>
+          <th className="p-3 font-medium hidden sm:table-cell">
+            SKU
+          </th>
+          <th className="p-3 font-medium hidden md:table-cell">
+            Quantity
+          </th>
+          <th className="p-3 font-medium hidden lg:table-cell">
+            Unit
+          </th>
+          <th className="p-3 font-medium hidden xl:table-cell">
+            Location
+          </th>
+          <th className="p-3 font-medium hidden 2xl:table-cell">
+            Created
+          </th>
+          <th className="p-3 font-medium text-center">
+            Action
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {inventory.length > 0 ? (
+          inventory.map((item, i) => {
+            const inRequest = requestList.find((r) => r.id === item.id);
+
+            return (
+              <tr
+                key={item.id}
+                className="border-t hover:bg-neutralLight"
+              >
+                <td className="p-3">
+                  {(page - 1) * 10 + i + 1}
+                </td>
+
+                <td className="p-3 font-medium">
+                  {item.name}
+                </td>
+
+                <td className="p-3 hidden sm:table-cell">
+                  {item.sku}
+                </td>
+
+                <td className="p-3 hidden md:table-cell">
+                  {item.quantity}
+                </td>
+
+                <td className="p-3 hidden lg:table-cell">
+                  {item.unit}
+                </td>
+
+                <td className="p-3 hidden xl:table-cell">
+                  {item.location?.name || "—"}
+                </td>
+
+                <td className="p-3 hidden 2xl:table-cell">
+                  {new Date(item.created_at).toLocaleDateString()}
+                </td>
+
+                <td className="p-3 text-center">
+                  <button
+                    onClick={() => handleOpenModal(item)}
+                    className={`px-3 py-1 rounded text-white transition ${
+                      inRequest
+                        ? "bg-yellow-500 hover:bg-yellow-600"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                  >
+                    {inRequest ? "Edit" : "Add"}
+                  </button>
                 </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </motion.div>
+            );
+          })
+        ) : (
+          <tr>
+            <td
+              colSpan={8}
+              className="p-4 text-center text-gray-500"
+            >
+              No inventory items found.
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</motion.div>
 
       {/* Pagination */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">

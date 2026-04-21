@@ -117,110 +117,216 @@ export default function ReturnedPage() {
       </div>
 
       {/* Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="overflow-x-auto border rounded-lg"
-      >
-        {loading ? (
-          <p className="p-4 text-gray-500 text-center">
-            Loading returned items...
-          </p>
-        ) : returnItem.length === 0 ? (
-          <p className="p-4 text-gray-500 text-center">
-            No returned items found.
-          </p>
-        ) : (
-          <table className="w-full border-collapse mt-2">
-            <thead className="bg-neutralLight text-left">
-              <tr>
-                <th className="p-3 text-sm font-medium">Request ID</th>
-                <th className="p-3 text-sm font-medium">Item Name</th>
-                <th className="p-3 text-sm font-medium">Warehouse</th>
-                <th className="p-3 text-sm font-medium">Quantity</th>
-                <th className="p-3 text-sm font-medium">Unit</th>
-                <th className="p-3 text-sm font-medium">Status</th>
-                <th className="p-3 text-sm font-medium">Created At</th>
-                <th className="p-3 text-sm font-medium">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {returnItem.map((item) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-sm font-mono">
-                    {item.inventory_request_id || "-"}
-                  </td>
-                  <td className="p-3 text-sm font-semibold text-gray-800">
-                    {item.inventory_name || "N/A"}
-                  </td>
-                  <td className="p-3 text-sm">{item.warehouse_name}</td>
-                  <td className="p-3 text-sm text-gray-700">
-                    <span
-                      className={`${
-                        item.quantity === 0
-                          ? "text-red-700"
-                          : item.quantity <= 10
-                            ? "text-yellow-700"
-                            : "text-green-700"
-                      }`}
-                    >
-                      {item.quantity}
-                    </span>
-                  </td>
-                  <td className="p-3 text-sm">{item.unit}</td>
-                  <td className="p-3 text-xs font-semibold uppercase">
-                    <span
-                      className={`${
-                        item.status === "pending"
-                          ? "text-yellow-600"
-                          : item.status === "approved"
-                            ? "text-green-600"
-                            : item.status === "rejected"
-                              ? "text-red-600"
-                              : "text-green-600"
-                      }`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-sm text-gray-600">
-                    {new Date(item.created_at).toLocaleString()}
-                  </td>
-                  <td className="p-3 text-sm">
-                    <div className="flex gap-2">
-                      {item.status === "pending" && (
-                        <button
-                          onClick={() => handleApprove(item)}
-                          className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
-                        >
-                          Approve
-                        </button>
-                      )}
+<motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="border rounded-lg"
+>
+  {/* ================= MOBILE VIEW ================= */}
+  <div className="md:hidden">
+    {loading ? (
+      <p className="p-4 text-gray-500 text-center">
+        Loading returned items...
+      </p>
+    ) : returnItem.length === 0 ? (
+      <p className="p-4 text-gray-500 text-center">
+        No returned items found.
+      </p>
+    ) : (
+      <div className="space-y-3 p-3">
+        {returnItem.map((item) => (
+          <div
+            key={item.id}
+            className="border rounded-xl p-4 shadow-sm bg-white"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs text-gray-500">Request ID</p>
+                <p className="font-mono text-sm font-semibold">
+                  {item.inventory_request_id || "-"}
+                </p>
+              </div>
 
-                      {item.status === "approved" && (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleMerge(item)}
-                            className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
-                          >
-                            Merge
-                          </button>
-                          <button
-                            onClick={() => handleRejected(item)}
-                            className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
-                          >
-                            Rejected
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </motion.div>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium text-white ${
+                  item.status === "pending"
+                    ? "bg-yellow-600"
+                    : item.status === "approved"
+                    ? "bg-green-600"
+                    : item.status === "rejected"
+                    ? "bg-red-600"
+                    : "bg-green-600"
+                }`}
+              >
+                {item.status}
+              </span>
+            </div>
+
+            {/* Details */}
+            <div className="mt-3 text-sm space-y-1">
+              <p>
+                <span className="font-medium">Item:</span>{" "}
+                {item.inventory_name || "N/A"}
+              </p>
+
+              <p>
+                <span className="font-medium">Warehouse:</span>{" "}
+                {item.warehouse_name}
+              </p>
+
+              <p>
+                <span className="font-medium">Quantity:</span>{" "}
+                {item.quantity}
+              </p>
+
+              <p>
+                <span className="font-medium">Unit:</span>{" "}
+                {item.unit}
+              </p>
+
+              <p>
+                <span className="font-medium">Date:</span>{" "}
+                {new Date(item.created_at).toLocaleString()}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2 mt-4">
+              {item.status === "pending" && (
+                <button
+                  onClick={() => handleApprove(item)}
+                  className="flex-1 bg-green-600 text-white rounded-lg py-1"
+                >
+                  Approve
+                </button>
+              )}
+
+              {item.status === "approved" && (
+                <>
+                  <button
+                    onClick={() => handleMerge(item)}
+                    className="flex-1 bg-green-600 text-white rounded-lg py-1"
+                  >
+                    Merge
+                  </button>
+
+                  <button
+                    onClick={() => handleRejected(item)}
+                    className="flex-1 bg-red-600 text-white rounded-lg py-1"
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+
+  {/* ================= DESKTOP TABLE ================= */}
+  <div className="hidden md:block overflow-x-auto">
+    {loading ? (
+      <p className="p-4 text-gray-500 text-center">
+        Loading returned items...
+      </p>
+    ) : returnItem.length === 0 ? (
+      <p className="p-4 text-gray-500 text-center">
+        No returned items found.
+      </p>
+    ) : (
+      <table className="w-full border-collapse mt-2">
+        <thead className="bg-neutralLight text-left">
+          <tr>
+            <th className="p-3 text-sm font-medium">Request ID</th>
+            <th className="p-3 text-sm font-medium">Item Name</th>
+            <th className="p-3 text-sm font-medium">Warehouse</th>
+            <th className="p-3 text-sm font-medium">Quantity</th>
+            <th className="p-3 text-sm font-medium">Unit</th>
+            <th className="p-3 text-sm font-medium">Status</th>
+            <th className="p-3 text-sm font-medium">Created At</th>
+            <th className="p-3 text-sm font-medium">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {returnItem.map((item) => (
+            <tr key={item.id} className="border-b hover:bg-gray-50">
+              <td className="p-3 text-sm font-mono">
+                {item.inventory_request_id || "-"}
+              </td>
+
+              <td className="p-3 text-sm font-semibold text-gray-800">
+                {item.inventory_name || "N/A"}
+              </td>
+
+              <td className="p-3 text-sm">{item.warehouse_name}</td>
+
+              <td className="p-3 text-sm text-gray-700">
+                {item.quantity}
+              </td>
+
+              <td className="p-3 text-sm">{item.unit}</td>
+
+              <td className="p-3 text-xs font-semibold uppercase">
+                <span
+                  className={`${
+                    item.status === "pending"
+                      ? "text-yellow-600"
+                      : item.status === "approved"
+                      ? "text-green-600"
+                      : item.status === "rejected"
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  {item.status}
+                </span>
+              </td>
+
+              <td className="p-3 text-sm text-gray-600">
+                {new Date(item.created_at).toLocaleString()}
+              </td>
+
+              <td className="p-3 text-sm">
+                <div className="flex gap-2">
+                  {item.status === "pending" && (
+                    <button
+                      onClick={() => handleApprove(item)}
+                      className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
+                    >
+                      Approve
+                    </button>
+                  )}
+
+                  {item.status === "approved" && (
+                    <>
+                      <button
+                        onClick={() => handleMerge(item)}
+                        className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
+                      >
+                        Merge
+                      </button>
+
+                      <button
+                        onClick={() => handleRejected(item)}
+                        className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+</motion.div>
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">

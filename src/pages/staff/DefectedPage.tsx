@@ -41,56 +41,138 @@ export default function DefectedPage() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-x-auto border rounded-lg"
+        className="border rounded-lg"
       >
-        {loading ? (
-          <p className="p-4 text-gray-500 text-center">Loading defected items...</p>
-        ) : defects.length === 0 ? (
-          <p className="p-4 text-gray-500 text-center">No defected items found.</p>
-        ) : (
-          <table className="w-full border-collapse mt-2">
-            <thead className="bg-neutralLight text-left">
-              <tr>
-                <th className="p-3 text-sm font-medium">Tracking #</th>
-                <th className="p-3 text-sm font-medium">Item</th>
-                <th className="p-3 text-sm font-medium">Quantity</th>
-                <th className="p-3 text-sm font-medium">Reason</th>
-                <th className="p-3 text-sm font-medium">Status</th>
-                <th className="p-3 text-sm font-medium">Created At</th>
-              </tr>
-            </thead>
-            <tbody>
+        {/* ================= MOBILE VIEW ================= */}
+        <div className="md:hidden">
+          {loading ? (
+            <p className="p-4 text-gray-500 text-center">
+              Loading defected items...
+            </p>
+          ) : defects.length === 0 ? (
+            <p className="p-4 text-gray-500 text-center">
+              No defected items found.
+            </p>
+          ) : (
+            <div className="space-y-3 p-3">
               {defects.map((defect) => (
-                <tr key={defect.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-sm font-mono">
-                    {defect.shipment?.tracking_number || "-"}
-                  </td>
-                  <td className="p-3 text-sm font-semibold text-gray-800">
-                    {defect.inventory?.name || "N/A"}
-                  </td>
-                  <td className="p-3 text-sm">{defect.quantity}</td>
-                  <td className="p-3 text-sm text-gray-700">{defect.reason}</td>
-                  <td className="p-3 text-xs font-semibold uppercase">
+                <div
+                  key={defect.id}
+                  className="border rounded-xl p-4 shadow-sm bg-white"
+                >
+                  {/* Header */}
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-xs text-gray-500">Tracking #</p>
+                      <p className="font-mono text-sm font-semibold">
+                        {defect.shipment?.tracking_number || "-"}
+                      </p>
+                    </div>
+
                     <span
-                      className={`${
+                      className={`px-2 py-1 rounded-full text-xs font-medium text-white ${
                         defect.status === "reject"
-                          ? "text-red-600"
+                          ? "bg-red-600"
                           : defect.status === "returned"
-                          ? "text-yellow-600"
-                          : "text-gray-700"
+                            ? "bg-yellow-600"
+                            : "bg-gray-700"
                       }`}
                     >
                       {defect.status}
                     </span>
-                  </td>
-                  <td className="p-3 text-sm text-gray-600">
-                    {new Date(defect.created_at).toLocaleString()}
-                  </td>
-                </tr>
+                  </div>
+
+                  {/* Details */}
+                  <div className="mt-3 text-sm space-y-1">
+                    <p>
+                      <span className="font-medium">Item:</span>{" "}
+                      {defect.inventory?.name || "N/A"}
+                    </p>
+
+                    <p>
+                      <span className="font-medium">Quantity:</span>{" "}
+                      {defect.quantity}
+                    </p>
+
+                    <p>
+                      <span className="font-medium">Reason:</span>{" "}
+                      {defect.reason}
+                    </p>
+
+                    <p>
+                      <span className="font-medium">Created:</span>{" "}
+                      {new Date(defect.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        )}
+            </div>
+          )}
+        </div>
+
+        {/* ================= DESKTOP TABLE ================= */}
+        <div className="hidden md:block overflow-x-auto">
+          {loading ? (
+            <p className="p-4 text-gray-500 text-center">
+              Loading defected items...
+            </p>
+          ) : defects.length === 0 ? (
+            <p className="p-4 text-gray-500 text-center">
+              No defected items found.
+            </p>
+          ) : (
+            <table className="w-full border-collapse mt-2">
+              <thead className="bg-neutralLight text-left">
+                <tr>
+                  <th className="p-3 text-sm font-medium">Tracking #</th>
+                  <th className="p-3 text-sm font-medium">Item</th>
+                  <th className="p-3 text-sm font-medium">Quantity</th>
+                  <th className="p-3 text-sm font-medium">Reason</th>
+                  <th className="p-3 text-sm font-medium">Status</th>
+                  <th className="p-3 text-sm font-medium">Created At</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {defects.map((defect) => (
+                  <tr key={defect.id} className="border-b hover:bg-gray-50">
+                    <td className="p-3 text-sm font-mono">
+                      {defect.shipment?.tracking_number || "-"}
+                    </td>
+
+                    <td className="p-3 text-sm font-semibold text-gray-800">
+                      {defect.inventory?.name || "N/A"}
+                    </td>
+
+                    <td className="p-3 text-sm">{defect.quantity}</td>
+
+                    <td className="p-3 text-sm text-gray-700">
+                      {defect.reason}
+                    </td>
+
+                    <td className="p-3 text-xs font-semibold uppercase">
+                      <span
+                        className={`${
+                          defect.status === "reject"
+                            ? "text-red-600"
+                            : defect.status === "returned"
+                              ? "text-yellow-600"
+                              : "text-gray-700"
+                        }`}
+                      >
+                        {defect.status}
+                      </span>
+                    </td>
+
+                    <td className="p-3 text-sm text-gray-600">
+                      {new Date(defect.created_at).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </motion.div>
 
       {/* Pagination */}

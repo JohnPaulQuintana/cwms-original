@@ -179,81 +179,150 @@ export default function ProjectPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto border rounded-lg">
-        <table className="w-full border-collapse">
-          <thead className="bg-neutralLight text-left">
-            <tr>
-              <th className="p-3 text-sm font-medium">#</th>
-              <th className="p-3 text-sm font-medium">Name</th>
-              <th className="p-3 text-sm font-medium hidden sm:table-cell">
-                Location
-              </th>
-              <th className="p-3 text-sm font-medium hidden md:table-cell">
-                Manager
-              </th>
-              <th className="p-3 text-sm font-medium hidden lg:table-cell">
-                Start Date
-              </th>
-              <th className="p-3 text-sm font-medium hidden lg:table-cell">
-                End Date
-              </th>
-              <th className="p-3 text-sm font-medium text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects && projects.length > 0 ? (
-              projects.map((project, i) => (
-                <tr key={project.id} className="border-t hover:bg-neutralLight">
-                  <td className="p-3 text-sm">{(page - 1) * 10 + i + 1}</td>
-                  <td className="p-3 text-sm font-medium">{project.name}</td>
-                  <td className="p-3 text-sm hidden sm:table-cell">
-                    {project.location}
-                  </td>
-                  <td className="p-3 text-sm hidden md:table-cell">
-                    {project.manager?.name}
-                  </td>
-                  <td className="p-3 text-sm hidden lg:table-cell">
-                    {project.start_date
-                      ? new Date(project.start_date).toLocaleDateString()
-                      : "-"}
-                  </td>
-                  <td className="p-3 text-sm hidden lg:table-cell">
-                    {project.end_date
-                      ? new Date(project.end_date).toLocaleDateString()
-                      : "-"}
-                  </td>
-                  <td className="p-3 text-sm">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => handleEdit(project)}
-                        className="text-blue-500 hover:text-blue-700 transition-colors"
-                      >
-                        <FiEdit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(project.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
-                      >
-                        <FiTrash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="text-center text-gray-500 py-4 text-sm"
+      {/* ================= WRAPPER ================= */}
+<div className="border rounded-lg">
+
+  {/* ================= MOBILE CARD VIEW ================= */}
+  <div className="md:hidden space-y-4 p-3">
+    {projects && projects.length > 0 ? (
+      projects.map((project, i) => (
+        <div
+          key={project.id}
+          className="border rounded-xl p-4 shadow-sm bg-white"
+        >
+          {/* Header */}
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs text-gray-500">
+                #{(page - 1) * 10 + i + 1}
+              </p>
+              <h2 className="font-semibold text-lg">
+                {project.name}
+              </h2>
+            </div>
+          </div>
+
+          {/* Details */}
+          <div className="mt-3 text-sm space-y-1">
+            <p>
+              <span className="font-medium">Location:</span>{" "}
+              {project.location || "—"}
+            </p>
+
+            <p>
+              <span className="font-medium">Manager:</span>{" "}
+              {project.manager?.name || "—"}
+            </p>
+
+            <p>
+              <span className="font-medium">Start Date:</span>{" "}
+              {project.start_date
+                ? new Date(project.start_date).toLocaleDateString()
+                : "-"}
+            </p>
+
+            <p>
+              <span className="font-medium">End Date:</span>{" "}
+              {project.end_date
+                ? new Date(project.end_date).toLocaleDateString()
+                : "-"}
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 mt-4">
+            <button
+              onClick={() => handleEdit(project)}
+              className="flex-1 text-blue-600 border border-blue-600 rounded-lg py-1"
+            >
+              Edit
+            </button>
+
+            <button
+              onClick={() => handleDelete(project.id)}
+              className="flex-1 text-red-600 border border-red-600 rounded-lg py-1"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      ))
+    ) : (
+      <p className="text-center text-gray-500 text-sm py-4">
+        No projects found.
+      </p>
+    )}
+  </div>
+
+  {/* ================= DESKTOP TABLE ================= */}
+  <div className="hidden md:block overflow-x-auto">
+    <table className="w-full border-collapse">
+      <thead className="bg-neutralLight text-left">
+        <tr>
+          <th className="p-3 text-sm font-medium">#</th>
+          <th className="p-3 text-sm font-medium">Name</th>
+          <th className="p-3 text-sm font-medium">Location</th>
+          <th className="p-3 text-sm font-medium">Manager</th>
+          <th className="p-3 text-sm font-medium">Start Date</th>
+          <th className="p-3 text-sm font-medium">End Date</th>
+          <th className="p-3 text-sm font-medium text-center">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {projects.map((project, i) => (
+          <tr key={project.id} className="border-t hover:bg-neutralLight">
+            <td className="p-3 text-sm">
+              {(page - 1) * 10 + i + 1}
+            </td>
+
+            <td className="p-3 text-sm font-medium">
+              {project.name}
+            </td>
+
+            <td className="p-3 text-sm">
+              {project.location}
+            </td>
+
+            <td className="p-3 text-sm">
+              {project.manager?.name}
+            </td>
+
+            <td className="p-3 text-sm">
+              {project.start_date
+                ? new Date(project.start_date).toLocaleDateString()
+                : "-"}
+            </td>
+
+            <td className="p-3 text-sm">
+              {project.end_date
+                ? new Date(project.end_date).toLocaleDateString()
+                : "-"}
+            </td>
+
+            <td className="p-3 text-sm">
+              <div className="flex justify-center gap-2">
+                <button
+                  onClick={() => handleEdit(project)}
+                  className="text-blue-500 hover:text-blue-700"
                 >
-                  No projects found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                  <FiEdit size={16} />
+                </button>
+
+                <button
+                  onClick={() => handleDelete(project.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <FiTrash2 size={16} />
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">

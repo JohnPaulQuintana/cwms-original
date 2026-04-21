@@ -223,37 +223,141 @@ export default function InventoryStaffPage() {
         </div>
       </div>
 
-      {/* Inventory Table */}
+      {/* ================= WRAPPER ================= */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-x-auto border rounded-lg"
+        className="border rounded-lg"
       >
-        <table className="w-full border-collapse text-sm">
-          <thead className="bg-neutralLight text-left">
-            <tr>
-              <th className="p-3 font-medium">#</th>
-              <th className="p-3 font-medium">Name</th>
-              <th className="p-3 font-medium hidden sm:table-cell">SKU</th>
-              <th className="p-3 font-medium hidden md:table-cell">Quantity</th>
-              <th className="p-3 font-medium hidden md:table-cell">
-                Reordered Qty
-              </th>
-              <th className="p-3 font-medium hidden lg:table-cell">Unit</th>
-              <th className="p-3 font-medium hidden xl:table-cell">Location</th>
-              <th className="p-3 font-medium hidden 2xl:table-cell">Created</th>
-              <th className="p-3 font-medium text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inventory.length > 0 ? (
-              inventory.map((item, i) => (
+        {/* ================= MOBILE CARD VIEW ================= */}
+        <div className="md:hidden space-y-4 p-3">
+          {inventory.length > 0 ? (
+            inventory.map((item, i) => (
+              <div
+                key={item.id}
+                className="border rounded-xl p-4 shadow-sm bg-white"
+              >
+                {/* Header */}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-xs text-gray-500">
+                      #{(page - 1) * 10 + i + 1}
+                    </p>
+                    <h2 className="font-semibold text-lg">{item.name}</h2>
+                  </div>
+
+                  {/* Stock Status */}
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium text-white ${
+                      item.quantity === 0
+                        ? "bg-red-600"
+                        : item.quantity <= 10
+                          ? "bg-yellow-600"
+                          : "bg-green-600"
+                    }`}
+                  >
+                    {item.quantity === 0
+                      ? "Out of Stock"
+                      : item.quantity <= 10
+                        ? "Low"
+                        : "In Stock"}
+                  </span>
+                </div>
+
+                {/* Details */}
+                <div className="mt-3 text-sm space-y-1">
+                  <p>
+                    <span className="font-medium">SKU:</span> {item.sku}
+                  </p>
+
+                  <p>
+                    <span className="font-medium">Quantity:</span>{" "}
+                    <span
+                      className={`${
+                        item.quantity === 0
+                          ? "text-red-700"
+                          : item.quantity <= 10
+                            ? "text-yellow-700"
+                            : "text-green-700"
+                      }`}
+                    >
+                      {item.quantity}
+                    </span>
+                  </p>
+
+                  <p>
+                    <span className="font-medium">Reorder:</span>{" "}
+                    {item.reorder_quantity > 0 ? (
+                      <span className="text-blue-700 font-semibold">
+                        {item.reorder_quantity} (Ordered)
+                      </span>
+                    ) : item.quantity === 0 ? (
+                      <span className="text-red-600">Needs Order</span>
+                    ) : (
+                      "—"
+                    )}
+                  </p>
+
+                  <p>
+                    <span className="font-medium">Unit:</span> {item.unit}
+                  </p>
+
+                  <p>
+                    <span className="font-medium">Location:</span>{" "}
+                    {item.location?.name || "—"}
+                  </p>
+
+                  <p>
+                    <span className="font-medium">Created:</span>{" "}
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="flex-1 text-blue-600 border border-blue-600 rounded-lg py-1"
+                  >
+                    Edit
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 py-4 text-sm">
+              No inventory items found.
+            </p>
+          )}
+        </div>
+
+        {/* ================= DESKTOP TABLE ================= */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead className="bg-neutralLight text-left">
+              <tr>
+                <th className="p-3 font-medium">#</th>
+                <th className="p-3 font-medium">Name</th>
+                <th className="p-3 font-medium">SKU</th>
+                <th className="p-3 font-medium">Quantity</th>
+                <th className="p-3 font-medium">Reordered Qty</th>
+                <th className="p-3 font-medium">Unit</th>
+                <th className="p-3 font-medium">Location</th>
+                <th className="p-3 font-medium">Created</th>
+                <th className="p-3 font-medium text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {inventory.map((item, i) => (
                 <tr key={item.id} className="border-t hover:bg-neutralLight">
                   <td className="p-3">{(page - 1) * 10 + i + 1}</td>
+
                   <td className="p-3 font-medium">{item.name}</td>
-                  <td className="p-3 hidden sm:table-cell">{item.sku}</td>
-                  {/* <td className="p-3 hidden md:table-cell">{item.quantity}</td> */}
-                  <td className="p-3 hidden md:table-cell">
+
+                  <td className="p-3">{item.sku}</td>
+
+                  <td className="p-3">
                     <div className="flex items-center gap-2">
                       <span
                         className={`${
@@ -266,7 +370,7 @@ export default function InventoryStaffPage() {
                       >
                         {item.quantity}
                       </span>
-                      
+
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           item.quantity === 0
@@ -284,7 +388,8 @@ export default function InventoryStaffPage() {
                       </span>
                     </div>
                   </td>
-                  <td className="p-3 hidden md:table-cell text-center">
+
+                  <td className="p-3 text-center">
                     {item.reorder_quantity > 0 ? (
                       <div className="flex flex-col items-center text-xs">
                         <span className="font-semibold text-blue-700">
@@ -302,40 +407,30 @@ export default function InventoryStaffPage() {
                       <span className="text-gray-400">—</span>
                     )}
                   </td>
-                  <td className="p-3 hidden lg:table-cell">{item.unit}</td>
-                  <td className="p-3 hidden xl:table-cell">
-                    {item.location?.name || "—"}
-                  </td>
-                  <td className="p-3 hidden 2xl:table-cell">
+
+                  <td className="p-3">{item.unit}</td>
+
+                  <td className="p-3">{item.location?.name || "—"}</td>
+
+                  <td className="p-3">
                     {new Date(item.created_at).toLocaleDateString()}
                   </td>
+
                   <td className="p-3">
                     <div className="flex justify-center gap-2">
                       <button
                         onClick={() => handleEdit(item)}
-                        className="text-blue-500 hover:text-blue-700 transition-colors"
+                        className="text-blue-500 hover:text-blue-700"
                       >
                         <FiEdit size={16} />
                       </button>
-                      {/* <button
-                        onClick={() => handleDelete(item.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
-                      >
-                        <FiTrash2 size={16} />
-                      </button> */}
                     </div>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={8} className="p-4 text-center text-gray-500">
-                  No inventory items found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </motion.div>
 
       {/* Pagination */}

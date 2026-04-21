@@ -97,7 +97,7 @@ export default function ProjectShipmentsPage() {
         .map((group) => ({
           ...group,
           shipments: group.shipments.filter(
-            (s: any) => s.status === selectedStatus
+            (s: any) => s.status === selectedStatus,
           ),
         }))
         .filter((group) => group.shipments.length > 0)
@@ -147,125 +147,217 @@ export default function ProjectShipmentsPage() {
                   </p>
                 </div>
 
-                {/* 📅 Display created_at (latest shipment in the group) */}
                 <p className="text-sm text-gray-500 mt-2 sm:mt-0">
                   <span className="font-medium text-gray-700">
                     Last Shipment:
                   </span>{" "}
                   {new Date(
-                    group.shipments[group.shipments.length - 1]?.created_at
+                    group.shipments[group.shipments.length - 1]?.created_at,
                   ).toLocaleString()}
                 </p>
               </div>
 
-              {/* 🚚 Shipments for this project */}
-              <table className="w-full border-collapse mt-2">
-                <thead className="bg-neutralLight text-left">
-                  <tr>
-                    <th className="p-3 text-sm font-medium">Tracking #</th>
-                    <th className="p-3 text-sm font-medium">Items</th>
-                    <th className="p-3 text-sm font-medium">Status</th>
-                    <th className="p-3 text-sm font-medium">Created By</th>
-                    <th className="p-3 text-sm font-medium">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {group.shipments.map((s: any) => (
-                    <tr key={s.id} className="border-b hover:bg-gray-50">
-                      <td className="p-3 text-sm font-mono">
+              {/* ================= MOBILE CARDS ================= */}
+              <div className="sm:hidden space-y-3 p-3">
+                {group.shipments.map((s: any) => (
+                  <div
+                    key={s.id}
+                    className="border rounded-lg p-3 bg-white shadow-sm"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-mono text-sm">
                         {s.tracking_number}
-                      </td>
-                      <td className="p-3 text-sm">
+                      </span>
+
+                      <span
+                        className={`px-2 py-1 rounded-full text-white text-xs ${
+                          s.status === "pending"
+                            ? "bg-yellow-500"
+                            : s.status === "in_transit"
+                              ? "bg-blue-500"
+                              : s.status === "shipped"
+                                ? "bg-indigo-500"
+                                : s.status === "delivered"
+                                  ? "bg-green-500"
+                                  : "bg-gray-500"
+                        }`}
+                      >
+                        {s.status.replace("_", " ")}
+                      </span>
+                    </div>
+
+                    <div className="text-sm space-y-1">
+                      <div>
+                        <span className="font-semibold">Items:</span>
                         {s.items.map((it: any) => (
-                          <div key={it.id} className="mb-1">
-                            <span className="font-semibold">
-                              {it.inventory_request.inventory.name}
-                            </span>{" "}
-                            ({it.quantity} {it.inventory_request.inventory.unit}
-                            )
+                          <div key={it.id} className="text-gray-700">
+                            {it.inventory_request.inventory.name} ({it.quantity}{" "}
+                            {it.inventory_request.inventory.unit})
                           </div>
                         ))}
-                      </td>
-                      <td className="p-3 text-xs font-semibold uppercase">
-                        <div
-                          className={`
-                            ${
-                              s.status === "pending"
-                                ? "text-yellow-600"
-                                : s.status === "in_transit"
-                                ? "text-blue-600"
-                                : s.status === "shipped"
-                                ? "text-indigo-600"
-                                : "text-green-600"
-                            }
-                            `}
-                        >
-                          {s.status.replace("_", " ")}
-                        </div>
+                      </div>
 
-                        {/* Progress Bar */}
-                        <div className="w-full bg-gray-200 h-2 rounded mt-2 overflow-hidden">
-                          <div
-                            className={`
-                                h-2 transition-all duration-700 ease-in-out
-                                ${
-                                  s.status === "pending"
-                                    ? "bg-yellow-500 w-1/4"
-                                    : s.status === "in_transit"
-                                    ? "bg-blue-500 w-2/4 animate-pulse"
-                                    : s.status === "shipped"
-                                    ? "bg-indigo-500 w-3/4"
-                                    : s.status === "delivered"
+                      <div>
+                        <span className="font-semibold">Created By:</span>{" "}
+                        {s.user?.name}
+                      </div>
+
+                      {/* Progress */}
+                      <div className="w-full bg-gray-200 h-2 rounded mt-2 overflow-hidden">
+                        <div
+                          className={`h-2 transition-all duration-700 ease-in-out ${
+                            s.status === "pending"
+                              ? "bg-yellow-500 w-1/4"
+                              : s.status === "in_transit"
+                                ? "bg-blue-500 w-2/4 animate-pulse"
+                                : s.status === "shipped"
+                                  ? "bg-indigo-500 w-3/4"
+                                  : s.status === "delivered"
                                     ? "bg-green-500 w-full"
                                     : "bg-gray-400 w-0"
-                                }
-                            `}
-                          ></div>
-                        </div>
-                      </td>
-                      <td className="p-3 text-sm">{s.user?.name}</td>
+                          }`}
+                        />
+                      </div>
 
-                      {/* ✅ Action Button */}
-                      <td className="p-3 text-sm text-center">
+                      {/* Actions */}
+                      <div className="flex gap-2 mt-3">
                         {s.status === "in_transit" && (
-                          <div className="relative group inline-block flex gap-2">
+                          <>
                             <button
                               onClick={() =>
                                 handleDelivered(s.id, s, "delivered")
                               }
-                              className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all"
-                              title="Mark as Delivered"
+                              className="flex-1 p-2 bg-green-500 text-white rounded"
                             >
-                              <FaTruck size={18} />
+                              Deliver
                             </button>
+
                             <button
                               onClick={() => {
                                 setSelectedShipment(s);
                                 setShowRejectModal(true);
-                                // assuming single item shipment, or you can customize for multi-item
                                 const totalQty = s.items.reduce(
                                   (sum: number, it: any) =>
                                     sum + it.inventory_request.requested_qty,
-                                  0
+                                  0,
                                 );
                                 setMaxQty(totalQty);
                               }}
-                              className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
-                              title="Mark as reject/returned"
+                              className="flex-1 p-2 bg-red-500 text-white rounded"
                             >
-                              <FaTruck size={18} />
+                              Return
                             </button>
-
-                            {/* <span className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-                              Mark as Delivered
-                            </span> */}
-                          </div>
+                          </>
                         )}
-                      </td>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ================= DESKTOP TABLE ================= */}
+              <div className="hidden sm:block">
+                <table className="w-full border-collapse mt-2">
+                  <thead className="bg-neutralLight text-left">
+                    <tr>
+                      <th className="p-3 text-sm font-medium">Tracking #</th>
+                      <th className="p-3 text-sm font-medium">Items</th>
+                      <th className="p-3 text-sm font-medium">Status</th>
+                      <th className="p-3 text-sm font-medium">Created By</th>
+                      <th className="p-3 text-sm font-medium">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+
+                  <tbody>
+                    {group.shipments.map((s: any) => (
+                      <tr key={s.id} className="border-b hover:bg-gray-50">
+                        <td className="p-3 text-sm font-mono">
+                          {s.tracking_number}
+                        </td>
+
+                        <td className="p-3 text-sm">
+                          {s.items.map((it: any) => (
+                            <div key={it.id}>
+                              <span className="font-semibold">
+                                {it.inventory_request.inventory.name}
+                              </span>{" "}
+                              ({it.quantity}{" "}
+                              {it.inventory_request.inventory.unit})
+                            </div>
+                          ))}
+                        </td>
+
+                        <td className="p-3 text-xs font-semibold uppercase">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs ${
+                              s.status === "pending"
+                                ? "text-yellow-500"
+                                : s.status === "in_transit"
+                                  ? "text-blue-500"
+                                  : s.status === "shipped"
+                                    ? "text-indigo-500"
+                                    : s.status === "delivered"
+                                      ? "text-green-500"
+                                      : "text-gray-500"
+                            }`}
+                          >
+                            {s.status.replace("_", " ")}
+                          </span>
+
+                          <div className="w-full bg-gray-200 h-2 rounded mt-2 overflow-hidden">
+                            <div
+                              className={`h-2 transition-all duration-700 ease-in-out ${
+                                s.status === "pending"
+                                  ? "bg-yellow-500 w-1/4"
+                                  : s.status === "in_transit"
+                                    ? "bg-blue-500 w-2/4 animate-pulse"
+                                    : s.status === "shipped"
+                                      ? "bg-indigo-500 w-3/4"
+                                      : s.status === "delivered"
+                                        ? "bg-green-500 w-full"
+                                        : "bg-gray-400 w-0"
+                              }`}
+                            />
+                          </div>
+                        </td>
+
+                        <td className="p-3 text-sm">{s.user?.name}</td>
+
+                        <td className="p-3 text-center">
+                          {s.status === "in_transit" && (
+                            <div className="flex gap-2 justify-center">
+                              <button
+                                onClick={() =>
+                                  handleDelivered(s.id, s, "delivered")
+                                }
+                                className="p-2 bg-green-500 text-white rounded-full"
+                              >
+                                <FaTruck size={18} />
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  setSelectedShipment(s);
+                                  setShowRejectModal(true);
+                                  const totalQty = s.items.reduce(
+                                    (sum: number, it: any) =>
+                                      sum + it.inventory_request.requested_qty,
+                                    0,
+                                  );
+                                  setMaxQty(totalQty);
+                                }}
+                                className="p-2 bg-red-500 text-white rounded-full"
+                              >
+                                <FaTruck size={18} />
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ))
         )}
@@ -349,7 +441,7 @@ export default function ProjectShipmentsPage() {
 
                   try {
                     const s = selectedShipment;
-                   
+
                     await postDefectRequests(
                       token!,
                       s.id,
@@ -359,7 +451,7 @@ export default function ProjectShipmentsPage() {
                         tracking_number: s.tracking_number,
                       })),
                       rejectReason,
-                       "reject"
+                      "reject",
                     );
 
                     await updateShipmentStatus(token!, s.id, "delivered");
@@ -369,7 +461,7 @@ export default function ProjectShipmentsPage() {
                   } catch (err: any) {
                     showToast(
                       err.message || "Failed to reject shipment",
-                      "error"
+                      "error",
                     );
                   }
                 }}
